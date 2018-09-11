@@ -61,3 +61,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+client/.mvn/wrapper/maven-wrapper.jar
+client/.mvn/wrapper/maven-wrapper.properties
+client/mvnw
+client/mvnw.cmd
+client/.mvn/wrapper/maven-wrapper.jar
