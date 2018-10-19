@@ -66,3 +66,11 @@ client/.mvn/wrapper/maven-wrapper.properties
 client/mvnw
 client/mvnw.cmd
 client/.mvn/wrapper/maven-wrapper.jar
+server/.mvn/wrapper/maven-wrapper.jar
+server/.mvn/wrapper/maven-wrapper.properties
+server/mvnw
+*.cmd
+server/.mvn/wrapper/maven-wrapper.jar
+register/.mvn/wrapper/maven-wrapper.jar
+register/.mvn/wrapper/maven-wrapper.properties
+register/mvnw
