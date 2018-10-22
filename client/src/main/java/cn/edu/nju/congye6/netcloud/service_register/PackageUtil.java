@@ -35,7 +35,6 @@ public class PackageUtil {
             while (iterator.hasMoreElements()) {
                 URL url = iterator.nextElement();
                 String protocol = url.getProtocol();
-                System.out.println(protocol);
                 List<Class<?>> childClassList = Collections.emptyList();
                 if("file".equals(protocol)){//只读取目录下文件
                     childClassList = getClassInFile(url, packageName, recursive);
