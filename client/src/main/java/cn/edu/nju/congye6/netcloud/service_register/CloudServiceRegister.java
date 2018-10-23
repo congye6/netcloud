@@ -40,7 +40,7 @@ public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
             CloudService cloudServiceAnnotation=clazz.getAnnotation(CloudService.class);
             if(cloudServiceAnnotation==null)//没有被注解
                 continue;
-            registerCloudService(clazz.getCanonicalName(),cloudServiceAnnotation,beanDefinitionRegistry);
+            registerCloudService(clazz,cloudServiceAnnotation,beanDefinitionRegistry);
         }
     }
 
@@ -51,16 +51,17 @@ public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
      * @param annotation
      * @param registry
      */
-    private void registerCloudService(String interfaceName,CloudService annotation,BeanDefinitionRegistry registry){
+    private void registerCloudService(Class<?> interfaceClass,CloudService annotation,BeanDefinitionRegistry registry){
         BeanDefinitionBuilder definitionBuilder = BeanDefinitionBuilder
                 .genericBeanDefinition(CloudServiceBean.class);
         //设置注解上的属性
         definitionBuilder.addPropertyValue("serviceName", annotation.serviceName());
+        definitionBuilder.addPropertyValue("type",interfaceClass);
         definitionBuilder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 
         AbstractBeanDefinition beanDefinition=definitionBuilder.getBeanDefinition();
-        BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, interfaceName,
-                null);
+        beanDefinition.setPrimary(true);
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, interfaceClass.getCanonicalName(), new String[]{"userCloudService"});
         BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
     }
 }
