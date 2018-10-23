@@ -8,11 +8,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.Proxy;
+
 /**
  * Created by cong on 2018-10-22.
  */
-public class CloudServiceBean implements FactoryBean<Object>, InitializingBean,
-        ApplicationContextAware{
+public class CloudServiceBean implements FactoryBean<Object>{
 
     private Class<?> type;
 
@@ -20,6 +21,24 @@ public class CloudServiceBean implements FactoryBean<Object>, InitializingBean,
      * 服务名称
      */
     private String serviceName;
+
+    @Nullable
+    @Override
+    public Object getObject() throws Exception {
+        return Proxy.newProxyInstance(type.getClassLoader(),new Class[]{type},new CloudServiceHandler());
+    }
+
+    /**
+     * 获取对象的类型
+     * @return
+     */
+    @Nullable
+    @Override
+    public Class<?> getObjectType() {
+        return type;
+    }
+
+
 
     public String getServiceName() {
         return serviceName;
@@ -35,32 +54,5 @@ public class CloudServiceBean implements FactoryBean<Object>, InitializingBean,
 
     public void setType(Class<?> type) {
         this.type = type;
-    }
-
-    @Nullable
-    @Override
-    public Object getObject() throws Exception {
-        return new UserCloudServiceImpl();
-    }
-
-    /**
-     * 获取对象的类型
-     * @return
-     */
-    @Nullable
-    @Override
-    public Class<?> getObjectType() {
-        return type;
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        System.out.println("start");
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-
     }
 }
