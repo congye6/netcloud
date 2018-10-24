@@ -25,7 +25,7 @@ public class CloudServiceBean implements FactoryBean<Object>{
     @Nullable
     @Override
     public Object getObject() throws Exception {
-        return Proxy.newProxyInstance(type.getClassLoader(),new Class[]{type},new CloudServiceHandler());
+        return Proxy.newProxyInstance(type.getClassLoader(),new Class[]{type},new CloudServiceHandler(serviceName));
     }
 
     /**

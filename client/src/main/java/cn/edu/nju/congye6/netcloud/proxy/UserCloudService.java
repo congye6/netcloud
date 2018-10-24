@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @CloudService(serviceName = "user")
 public interface UserCloudService {
 
-    @RequestMapping("addUser")
+    @RequestMapping("/addUser")
     public void addUser();
 
 }
