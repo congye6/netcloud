@@ -1,6 +1,6 @@
 package cn.edu.nju.congye6.netcloud.service_register;
 
-import cn.edu.nju.congye6.netcloud.proxy.UserCloudServiceImpl;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;

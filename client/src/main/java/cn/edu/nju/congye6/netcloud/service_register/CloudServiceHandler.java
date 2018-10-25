@@ -16,13 +16,13 @@ public class CloudServiceHandler implements InvocationHandler{
      */
     private String serviceName;
 
+    public CloudServiceHandler(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RequestMapping requestMapping=method.getAnnotation(RequestMapping.class);
-        if(requestMapping==null|| StringUtils.isEmpty(requestMapping.value()))
-            throw new Exception("please configure url with @RequestMapping");
-        String path=requestMapping.value()[0];
-
         return null;
     }
 
