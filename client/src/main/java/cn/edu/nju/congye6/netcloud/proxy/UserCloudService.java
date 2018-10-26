@@ -1,7 +1,9 @@
 package cn.edu.nju.congye6.netcloud.proxy;
 
 import cn.edu.nju.congye6.netcloud.annotation.CloudService;
+import cn.edu.nju.congye6.netcloud.service.User;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Created by cong on 2018-10-22.
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @CloudService(serviceName = "user")
 public interface UserCloudService {
 
-    @RequestMapping("/addUser")
-    public void addUser();
+    @RequestMapping(value = "/addUser")
+    public String addUser(User user);
 
 }

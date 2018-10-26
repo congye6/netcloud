@@ -22,6 +22,8 @@ public class HttpClient {
 
     private static final String REQUEST_PARAM_END="}";
 
+    private static final String DEFAULT_HOST="http://localhost:8080";
+
     static {
         REQUEST_METHOD_MAP.put(RequestMethod.GET,RequestMethod.GET);
         REQUEST_METHOD_MAP.put(RequestMethod.DELETE,RequestMethod.POST);
@@ -45,11 +47,13 @@ public class HttpClient {
 
             OkHttpClient client = new OkHttpClient();
 
-            Request request=buildRequest(null,parameters,requestMapping);
+            Request request=buildRequest(DEFAULT_HOST+requestMapping.value()[0],parameters,requestMapping);
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
                 throw new IOException("服务器端错误: " + response);
             }
+            if(returnType==String.class)
+                return response.body().string();
             return JSONObject.parseObject(response.body().string(), returnType);
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,6 +77,12 @@ public class HttpClient {
      * @throws Exception
      */
     private RequestMethod selectMethod(RequestMethod[] methods,int paramNums) throws Exception{
+        if(methods.length==0){//未配置
+            methods=new RequestMethod[]{
+                    RequestMethod.POST,RequestMethod.GET
+            };
+        }
+
         if(paramNums>1){//参数个数大于1，不能使用post
             for(RequestMethod method:methods){
                 if(method==RequestMethod.GET)
