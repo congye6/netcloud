@@ -3,8 +3,13 @@ package cn.edu.nju.congye6.netcloud.zookeeper;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 对外提供zookeeper服务
@@ -12,13 +17,20 @@ import org.apache.zookeeper.data.Stat;
  */
 public class ZookeeeperService {
 
-    private static final String NETCLOUD_ROOT_NODE="/netcloud";
+    private static final String NETCLOUD_ROOT_NODE = "/netcloud";
 
-    public static boolean exist(String path){
-        ZooKeeper zookeeper=ZookeeperManager.getZookeeper();
+    /**
+     * 判断是否节点存在
+     * 不添加watcher
+     *
+     * @param path
+     * @return
+     */
+    public static boolean exist(String path) {
+        ZooKeeper zookeeper = ZookeeperManager.getZookeeper();
         try {
-            Stat status=zookeeper.exists(path,false);
-            return status!=null;
+            Stat status = zookeeper.exists(path, false);
+            return status != null;
         } catch (KeeperException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -27,10 +39,17 @@ public class ZookeeeperService {
         return false;
     }
 
-    public static void createNode(String path, byte[] data, CreateMode createMode){
-        ZooKeeper zookeeper=ZookeeperManager.getZookeeper();
+    /**
+     * 创建节点
+     * 不添加acl权限
+     * @param path
+     * @param data
+     * @param createMode
+     */
+    public static void createNode(String path, byte[] data, CreateMode createMode) {
+        ZooKeeper zookeeper = ZookeeperManager.getZookeeper();
         try {
-            zookeeper.create(path,data,null,createMode);
+            zookeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
         } catch (KeeperException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -39,9 +58,22 @@ public class ZookeeeperService {
     }
 
 
-
-
-
+    /**
+     * 获取子节点
+     * @param path
+     * @return
+     */
+    public static List<String> getChildren(String path) {
+        ZooKeeper zookeeper = ZookeeperManager.getZookeeper();
+        try {
+            return zookeeper.getChildren(path,false);
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
 
 
 }
