@@ -1,4 +1,4 @@
-package cn.edu.nju.congye6.netcloud.service_register;
+package cn.edu.nju.congye6.netcloud.util;
 
 import java.io.File;
 import java.io.IOException;

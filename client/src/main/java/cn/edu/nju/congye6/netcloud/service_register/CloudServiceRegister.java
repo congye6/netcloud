@@ -1,8 +1,7 @@
 package cn.edu.nju.congye6.netcloud.service_register;
 
 import cn.edu.nju.congye6.netcloud.annotation.CloudService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import cn.edu.nju.congye6.netcloud.util.PackageUtil;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -10,10 +9,8 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

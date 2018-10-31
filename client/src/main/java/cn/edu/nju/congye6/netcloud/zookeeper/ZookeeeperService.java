@@ -1,10 +1,7 @@
 package cn.edu.nju.congye6.netcloud.zookeeper;
 
 
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 
@@ -16,8 +13,6 @@ import java.util.List;
  * Created by cong on 2018-10-29.
  */
 public class ZookeeeperService {
-
-    private static final String NETCLOUD_ROOT_NODE = "/netcloud";
 
     /**
      * 判断是否节点存在
@@ -63,10 +58,11 @@ public class ZookeeeperService {
      * @param path
      * @return
      */
-    public static List<String> getChildren(String path) {
+    public static List<String> getChildren(String path, Watcher watcher) {
         ZooKeeper zookeeper = ZookeeperManager.getZookeeper();
         try {
-            return zookeeper.getChildren(path,false);
+
+            return zookeeper.getChildren(path,watcher);
         } catch (KeeperException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
