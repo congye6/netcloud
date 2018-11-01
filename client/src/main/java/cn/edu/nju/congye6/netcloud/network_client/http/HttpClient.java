@@ -1,5 +1,6 @@
 package cn.edu.nju.congye6.netcloud.network_client.http;
 
+import cn.edu.nju.congye6.netcloud.service_router.CloudServiceRouter;
 import com.alibaba.fastjson.JSONObject;
 import com.squareup.okhttp.*;
 import org.springframework.util.StringUtils;
@@ -22,14 +23,14 @@ public class HttpClient {
 
     private static final String REQUEST_PARAM_END="}";
 
-    private static final String DEFAULT_HOST="http://localhost:8080";
-
     static {
         REQUEST_METHOD_MAP.put(RequestMethod.GET,RequestMethod.GET);
         REQUEST_METHOD_MAP.put(RequestMethod.DELETE,RequestMethod.POST);
         REQUEST_METHOD_MAP.put(RequestMethod.PUT,RequestMethod.POST);
         REQUEST_METHOD_MAP.put(RequestMethod.POST,RequestMethod.POST);
     }
+
+    private CloudServiceRouter router=new CloudServiceRouter();
 
     /**
      * 发送http请求
@@ -47,7 +48,9 @@ public class HttpClient {
 
             OkHttpClient client = new OkHttpClient();
 
-            Request request=buildRequest(DEFAULT_HOST+requestMapping.value()[0],parameters,requestMapping);
+            String address=router.getAddress(serviceName);
+
+            Request request=buildRequest(address+requestMapping.value()[0],parameters,requestMapping);
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
                 throw new IOException("服务器端错误: " + response);
