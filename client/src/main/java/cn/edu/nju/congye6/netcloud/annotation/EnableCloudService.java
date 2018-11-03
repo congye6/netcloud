@@ -1,5 +1,6 @@
 package cn.edu.nju.congye6.netcloud.annotation;
 
+import cn.edu.nju.congye6.netcloud.enumeration.LoadBalance;
 import cn.edu.nju.congye6.netcloud.service_register.CloudServiceRegister;
 import org.springframework.context.annotation.Import;
 
@@ -15,4 +16,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})//定义注解的作用目标**作用范围字段、枚举的常量/方法
 @Import(CloudServiceRegister.class)
 public @interface EnableCloudService {
+
+    /**
+     * 负载均衡方式
+     * @return
+     */
+    LoadBalance loadBalance() default LoadBalance.RANDOM;
+
+
 }

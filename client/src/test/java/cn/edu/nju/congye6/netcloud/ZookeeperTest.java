@@ -21,7 +21,7 @@ public class ZookeeperTest {
         System.out.println(ZookeeeperService.exist("/test"));
         ZookeeeperService.createNode("/test/child",null,CreateMode.EPHEMERAL);
         ZookeeeperService.createNode("/test/127.0.0.1:8080",null,CreateMode.EPHEMERAL);
-        System.out.println(ZookeeeperService.getChildren("/test",new ServiceChangeWatcher("test")));
+        System.out.println(ZookeeeperService.getChildren("/test",new ServiceChangeWatcher("test",null)));
         ZookeeeperService.createNode("/test/127.0.0.2:8080",null,CreateMode.EPHEMERAL);
     }
 
