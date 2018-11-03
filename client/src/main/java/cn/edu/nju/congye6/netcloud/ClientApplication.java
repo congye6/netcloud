@@ -1,11 +1,11 @@
 package cn.edu.nju.congye6.netcloud;
 
-import cn.edu.nju.congye6.netcloud.annotation.EnableCloudService;
+import cn.edu.nju.congye6.netcloud.annotation.EnableCloudClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableCloudService
+@EnableCloudClient
 public class ClientApplication {
 
 	public static void main(String[] args) {

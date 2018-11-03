@@ -1,7 +1,6 @@
 package cn.edu.nju.congye6.netcloud.zookeeper;
 
 import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
-import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
