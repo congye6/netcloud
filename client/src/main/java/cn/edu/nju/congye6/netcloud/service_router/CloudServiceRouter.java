@@ -2,6 +2,7 @@ package cn.edu.nju.congye6.netcloud.service_router;
 
 import cn.edu.nju.congye6.netcloud.service_router.load_balancer.LoadBalancer;
 import cn.edu.nju.congye6.netcloud.service_router.load_balancer.RoundRobinLoadBalancer;
+import org.apache.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
  * Created by cong on 2018-10-30.
  */
 public class CloudServiceRouter{
+
+    private static final Logger LOGGER=Logger.getLogger(CloudServiceRouter.class);
 
     /**
      * 负载均衡器
@@ -42,9 +45,11 @@ public class CloudServiceRouter{
      */
     public String getAddress(String serviceName){
         List<String> addressList=addressCache.getAddressList(serviceName);
+        System.out.println(serviceName+"(cache):"+addressList);
         if(!CollectionUtils.isEmpty(addressList))//缓存中存在
             return loadBalancer.next(serviceName,addressList);
         addressList=addressFinder.getAddressList(serviceName);
+        System.out.println(serviceName+":"+addressList);
         if(CollectionUtils.isEmpty(addressList))//找不到地址
             return null;
         addressCache.updateAddress(serviceName,addressList);//保存缓存

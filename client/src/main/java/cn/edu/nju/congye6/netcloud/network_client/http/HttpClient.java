@@ -50,7 +50,7 @@ public class HttpClient {
 
             String address=router.getAddress(serviceName);
 
-            Request request=buildRequest(address+requestMapping.value()[0],parameters,requestMapping);
+            Request request=buildRequest("http://"+address+requestMapping.value()[0],parameters,requestMapping);
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
                 throw new IOException("服务器端错误: " + response);
