@@ -25,8 +25,10 @@ public class ZookeeperManager {
         Watcher watcher=new ConnectionWatcher(countDownLatch);
         try {
             zookeeper=new ZooKeeper(PropertyUtil.getProperty(ZOOKEEPER_HOST_LIST_KEY),SESSION_TIME_OUT,watcher);
-            countDownLatch.countDown();
+            countDownLatch.await();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
