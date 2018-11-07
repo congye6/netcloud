@@ -17,6 +17,8 @@ public class CloudServiceRouter{
 
     private static final Logger LOGGER=Logger.getLogger(CloudServiceRouter.class);
 
+    private static CloudServiceRouter cloudServiceRouter=new CloudServiceRouter();
+
     /**
      * 负载均衡器
      */
@@ -32,10 +34,14 @@ public class CloudServiceRouter{
      */
     private AddressFinder addressFinder;
 
-    public  CloudServiceRouter(){
+    private  CloudServiceRouter(){
         loadBalancer=new RoundRobinLoadBalancer();
         addressCache=new AddressCache();
         addressFinder=new AddressFinder(this);
+    }
+
+    public static CloudServiceRouter getServiceRouter(){
+        return cloudServiceRouter;
     }
 
     /**

@@ -58,7 +58,7 @@ public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
 
         AbstractBeanDefinition beanDefinition=definitionBuilder.getBeanDefinition();
         beanDefinition.setPrimary(true);
-        BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, interfaceClass.getCanonicalName(), new String[]{"userCloudService"});
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, interfaceClass.getCanonicalName(), new String[]{});
         BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
     }
 }

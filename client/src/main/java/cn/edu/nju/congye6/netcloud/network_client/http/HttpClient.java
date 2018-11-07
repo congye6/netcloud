@@ -1,8 +1,10 @@
 package cn.edu.nju.congye6.netcloud.network_client.http;
 
 import cn.edu.nju.congye6.netcloud.service_router.CloudServiceRouter;
+import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.squareup.okhttp.*;
+import org.apache.log4j.Logger;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,6 +17,8 @@ import java.util.*;
  */
 public class HttpClient {
 
+    private static final Logger LOGGER=Logger.getLogger(HttpClient.class);
+
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json");
 
     private static final Map<RequestMethod,RequestMethod> REQUEST_METHOD_MAP=new HashMap<>();
@@ -23,6 +27,8 @@ public class HttpClient {
 
     private static final String REQUEST_PARAM_END="}";
 
+    private static final String SOURCE_SERVICE_KEY="cn.edu.nju.congye6.cloudservice.name";
+
     static {
         REQUEST_METHOD_MAP.put(RequestMethod.GET,RequestMethod.GET);
         REQUEST_METHOD_MAP.put(RequestMethod.DELETE,RequestMethod.POST);
@@ -30,11 +36,10 @@ public class HttpClient {
         REQUEST_METHOD_MAP.put(RequestMethod.POST,RequestMethod.POST);
     }
 
-    private CloudServiceRouter router=new CloudServiceRouter();
+    private CloudServiceRouter router=CloudServiceRouter.getServiceRouter();
 
     /**
      * 发送http请求
-     * TODO 未测试
      * @param returnType
      * @param parameters
      * @param url
@@ -158,7 +163,7 @@ public class HttpClient {
 
     private Request.Builder commonHeader(Request.Builder requestBuilder){
         return requestBuilder.header("User-Agent", "NetCloud")
-                .header("Source", "exam")
+                .header("Source", PropertyUtil.getProperty(SOURCE_SERVICE_KEY))
                 .header("Accept", "application/json");
     }
 
