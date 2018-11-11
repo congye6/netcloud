@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by cong on 2018-10-24.
  */
-public class CloudRequest {
+public class RpcRequest {
 
     /**
      * 请求id，标识一次请求
