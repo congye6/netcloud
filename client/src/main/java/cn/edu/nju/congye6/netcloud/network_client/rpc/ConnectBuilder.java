@@ -15,7 +15,7 @@ public class ConnectBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(ConnectBuilder.class);
 
-    private static final String ADDRESS_SPLITER=":";
+    private static final String ADDRESS_SPLITER = ":";
 
     /**
      * 监听可用时间的多个selctor的线程池
@@ -24,37 +24,36 @@ public class ConnectBuilder {
 
     /**
      * 创建连接
+     *
      * @param address
      */
-    public void build(String address){
-        if(StringUtils.isEmpty(address)){
+    public void build(String address) {
+        if (StringUtils.isEmpty(address)) {
             LOGGER.error("address empty");
             return;
         }
 
-        String[] args=address.split(ADDRESS_SPLITER);
-        if(args.length!=2){
-            LOGGER.error("address format wrong,address:"+address);
+        String[] args = address.split(ADDRESS_SPLITER);
+        if (args.length != 2) {
+            LOGGER.error("address format wrong,address:" + address);
             return;
         }
 
-        String host=args[0];
+        String host = args[0];
         Integer port;
         try {
-            port=Integer.parseInt(args[1]);
-        }catch (Exception e){
-            LOGGER.error("wrong port:"+args[1],e);
+            port = Integer.parseInt(args[1]);
+        } catch (Exception e) {
+            LOGGER.error("wrong port:" + args[1], e);
             return;
         }
-        build(host,port);
+        build(host, port);
     }
 
     public void build(String host, int port) {
-        EventLoopGroup group = new NioEventLoopGroup();
 
         Bootstrap b = new Bootstrap();
-        b.group(group) // 注册线程池
-                .channel(NioSocketChannel.class)// 使用NioSocketChannel来作为连接用的channel类
+        b.channel(NioSocketChannel.class)// 使用NioSocketChannel来作为连接用的channel类
                 .group(SELECTORS)
                 .handler(new ChannelInitializer<SocketChannel>() { // 绑定连接初始化器
                     @Override
