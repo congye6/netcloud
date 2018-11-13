@@ -1,9 +1,9 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -27,16 +27,16 @@ public class ConnectBuilder {
      *
      * @param address
      */
-    public void build(String address) {
+    public Channel build(String address) {
         if (StringUtils.isEmpty(address)) {
             LOGGER.error("address empty");
-            return;
+            return null;
         }
 
         String[] args = address.split(ADDRESS_SPLITER);
         if (args.length != 2) {
             LOGGER.error("address format wrong,address:" + address);
-            return;
+            return null;
         }
 
         String host = args[0];
@@ -45,12 +45,12 @@ public class ConnectBuilder {
             port = Integer.parseInt(args[1]);
         } catch (Exception e) {
             LOGGER.error("wrong port:" + args[1], e);
-            return;
+            return null;
         }
-        build(host, port);
+        return build(host, port);
     }
 
-    public void build(String host, int port) {
+    public Channel build(String host, int port) {
 
         Bootstrap b = new Bootstrap();
         b.channel(NioSocketChannel.class)// 使用NioSocketChannel来作为连接用的channel类
@@ -69,12 +69,12 @@ public class ConnectBuilder {
 
         try {
             ChannelFuture cf = b.connect(host, port).sync(); // 异步连接服务器
-            cf.channel();
+            return cf.channel();
         } catch (InterruptedException e) {
             LOGGER.error("connect error", e);
         }
         LOGGER.info("connected..."); // 连接完成
-
+        return null;
     }
 
 }

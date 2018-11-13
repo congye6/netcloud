@@ -15,20 +15,39 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class RpcFuture{
 
+    /**
+     * 加锁
+     */
     private ReentrantLock lock=new ReentrantLock();
 
+    /**
+     * 当任务未完成时，进入等待队列
+     */
     private Condition condition=lock.newCondition();
 
-    private RpcResponse response;
+    /**
+     * 响应
+     */
+    private volatile RpcResponse response;
 
+    /**
+     * 是否已经完成
+     * @return
+     */
     public boolean isDone() {
-        return false;
+        return response!=null;
     }
 
+    /**
+     * 获取响应
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
     public RpcResponse get() throws InterruptedException, ExecutionException {
         lock.lock();
         try {
-            if(response==null)
+            if(isDone())
                 condition.await();
         }finally {
             lock.unlock();
@@ -37,10 +56,19 @@ public class RpcFuture{
         return response;
     }
 
+    /**
+     * 获取响应，超时则抛出异常
+     * @param timeout
+     * @param unit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     */
     public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         lock.lock();
         try {
-            if(response==null){
+            if(isDone()){
                 boolean success=condition.await(timeout,unit);
                 if(!success)
                     throw new TimeoutException("获取响应超时");
