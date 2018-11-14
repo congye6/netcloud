@@ -51,22 +51,20 @@ public class ConnectBuilder {
     }
 
     public Channel build(String host, int port) {
-
         Bootstrap b = new Bootstrap();
         b.channel(NioSocketChannel.class)// 使用NioSocketChannel来作为连接用的channel类
-                .group(SELECTORS)
+                .group(SELECTORS)//设置selectors线程池
                 .handler(new ChannelInitializer<SocketChannel>() { // 绑定连接初始化器
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         //TODO 顺序
-                        ch.pipeline().addLast(new RpcEncoder())
-                                .addLast(new LengthFieldBasedFrameDecoder(65536, 0, 4, 0, 0))
-                                .addLast(new RpcDecoder(RpcResponse.class))
-                                .addLast(new EchoClientHandler());
+                        ch.pipeline().addLast(new RpcEncoder())//编码器，用于请求
+                                .addLast(new LengthFieldBasedFrameDecoder(65536, 0, 4, 0, 0))//tcp粘包处理
+                                .addLast(new RpcDecoder(RpcResponse.class))//解码器,每次获取到一个完整的响应才交给下一个handler
+                                .addLast(new ResponseHandler());
                     }
                 });
         LOGGER.info("created to " + host + ":" + port);
-
         try {
             ChannelFuture cf = b.connect(host, port).sync(); // 异步连接服务器
             return cf.channel();

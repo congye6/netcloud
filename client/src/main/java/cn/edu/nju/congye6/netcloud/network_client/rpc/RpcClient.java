@@ -28,7 +28,7 @@ public class RpcClient {
 
     public Object send(String serviceName, Object[] params, RpcService rpcService) throws Exception {
         RpcRequest request = new RpcRequest();
-        request.setRpcId(UuidUtil.uuid());
+        request.setRpcId(UuidUtil.uuid());//requestid 为 uuid
 
         String rpcId = rpcService.rpcId();
         if (StringUtils.isEmpty(rpcId))
@@ -44,15 +44,15 @@ public class RpcClient {
         header.put("ContentType", contentType.toString());
         request.setHeaders(header);
 
+        //发起调用
         String address = serviceRouter.getAddress(serviceName);
-        Channel channel = channelPool.getChannel(address);
-        channel.writeAndFlush(request);
-
-        ResponseHandler responseHandler;
+        Channel channel = channelPool.getChannel(address);//获取channel
+        ResponseHandler responseHandler=channel.pipeline().get(ResponseHandler.class);
         RpcFuture future=new RpcFuture();
-
-
-        return null;
+        responseHandler.addRpcFuture(request.getRequestId(),future);//设置future，以便异步获取结果
+        channel.writeAndFlush(request);
+        //TODO 异步获取future
+        return future.get();
     }
 
     /**
