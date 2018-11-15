@@ -1,9 +1,6 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,15 +15,11 @@ public class RpcFuture{
     /**
      * 加锁
      */
-    private ReentrantLock lock=new ReentrantLock();
-
-    /**
-     * 当任务未完成时，进入等待队列
-     */
-    private Condition condition=lock.newCondition();
+    private CountDownLatch countDownLatch=new CountDownLatch(1);
 
     /**
      * 响应
+     * volatile保证设置完成后，其他线程能马上读到
      */
     private volatile RpcResponse response;
 
@@ -45,13 +38,9 @@ public class RpcFuture{
      * @throws ExecutionException
      */
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        lock.lock();
-        try {
-            if(isDone())
-                condition.await();
-        }finally {
-            lock.unlock();
-        }
+
+        if(!isDone())
+            countDownLatch.await();
 
         return response;
     }
@@ -66,17 +55,12 @@ public class RpcFuture{
      * @throws TimeoutException
      */
     public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        lock.lock();
-        try {
-            if(isDone()){
-                boolean success=condition.await(timeout,unit);
-                if(!success)
-                    throw new TimeoutException("获取响应超时");
-            }
-        }finally {
-            lock.unlock();
-        }
 
+        if(!isDone()){
+            boolean success=countDownLatch.await(timeout,unit);
+            if(!success)
+                throw new TimeoutException("获取响应超时");
+        }
         return response;
     }
 
@@ -85,12 +69,7 @@ public class RpcFuture{
      * @param response
      */
     public void set(RpcResponse response){
-        lock.lock();
-        try {
-            this.response=response;
-            condition.signalAll();//通知所有等待线程
-        }finally {
-            lock.unlock();
-        }
+        this.response=response;
+        countDownLatch.countDown();//实发latch，唤醒所有等待线程
     }
 }
