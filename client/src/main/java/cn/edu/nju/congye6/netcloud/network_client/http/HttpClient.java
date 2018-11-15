@@ -1,10 +1,16 @@
 package cn.edu.nju.congye6.netcloud.network_client.http;
 
+import cn.edu.nju.congye6.netcloud.network_client.request_builder.HttpRequestBuilder;
+import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestBuilder;
+import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestInterceptor;
+import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestInterceptorPipeline;
 import cn.edu.nju.congye6.netcloud.service_router.CloudServiceRouter;
+import cn.edu.nju.congye6.netcloud.util.CloudContextUtil;
 import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.squareup.okhttp.*;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,7 +42,15 @@ public class HttpClient {
         REQUEST_METHOD_MAP.put(RequestMethod.POST,RequestMethod.POST);
     }
 
+    /**
+     * 地址路由器
+     */
     private CloudServiceRouter router=CloudServiceRouter.getServiceRouter();
+
+    /**
+     * 拦截器执行器
+     */
+    private RequestInterceptorPipeline pipeline=new RequestInterceptorPipeline();
 
     /**
      * 发送http请求
@@ -162,10 +176,12 @@ public class HttpClient {
     }
 
     private Request.Builder commonHeader(Request.Builder requestBuilder){
+        pipeline.pipeline(new HttpRequestBuilder(requestBuilder));//执行拦截器方法
         return requestBuilder.header("User-Agent", "NetCloud")
                 .header("Source", PropertyUtil.getProperty(SOURCE_SERVICE_KEY))
                 .header("Accept", "application/json");
     }
+
 
 
 }

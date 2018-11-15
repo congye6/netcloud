@@ -59,4 +59,10 @@ public class RpcRequest {
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
+
+    public void addHeader(String key,String value){
+        if(headers==null)
+            headers=new HashMap<>();
+        headers.put(key,value);
+    }
 }

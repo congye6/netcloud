@@ -2,6 +2,8 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.enumeration.RpcContentType;
+import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestInterceptorPipeline;
+import cn.edu.nju.congye6.netcloud.network_client.request_builder.RpcRequestBuilder;
 import cn.edu.nju.congye6.netcloud.service_router.CloudServiceRouter;
 import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
 import cn.edu.nju.congye6.netcloud.util.UuidUtil;
@@ -24,7 +26,15 @@ public class RpcClient {
      */
     private CloudServiceRouter serviceRouter = CloudServiceRouter.getServiceRouter();
 
+    /**
+     * 连接池
+     */
     private ChannelPool channelPool = ChannelPool.getInstance();
+
+    /**
+     * 拦截器执行器
+     */
+    private RequestInterceptorPipeline pipeline=new RequestInterceptorPipeline();
 
     public Object send(String serviceName, Object[] params, RpcService rpcService) throws Exception {
         RpcRequest request = new RpcRequest();
@@ -43,6 +53,8 @@ public class RpcClient {
         header.put("Source", PropertyUtil.getProperty(SOURCE_SERVICE_KEY));
         header.put("ContentType", contentType.toString());
         request.setHeaders(header);
+
+        pipeline.pipeline(new RpcRequestBuilder(request));
 
         //发起调用
         String address = serviceRouter.getAddress(serviceName);

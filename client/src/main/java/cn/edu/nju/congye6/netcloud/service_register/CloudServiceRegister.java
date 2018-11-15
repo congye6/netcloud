@@ -2,6 +2,7 @@ package cn.edu.nju.congye6.netcloud.service_register;
 
 import cn.edu.nju.congye6.netcloud.annotation.CloudService;
 import cn.edu.nju.congye6.netcloud.util.PackageUtil;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -61,4 +62,5 @@ public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
         BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, interfaceClass.getCanonicalName(), new String[]{});
         BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
     }
+
 }
