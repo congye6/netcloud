@@ -32,12 +32,12 @@ public class CloudServiceRouter{
     /**
      * 地址获取
      */
-    private AddressFinder addressFinder;
+    private AddressDicover addressDicover;
 
     private  CloudServiceRouter(){
         loadBalancer=new RoundRobinLoadBalancer();
         addressCache=new AddressCache();
-        addressFinder=new AddressFinder(this);
+        addressDicover =new AddressDicover(this);
     }
 
     public static CloudServiceRouter getServiceRouter(){
@@ -54,7 +54,7 @@ public class CloudServiceRouter{
         System.out.println(serviceName+"(cache):"+addressList);
         if(!CollectionUtils.isEmpty(addressList))//缓存中存在
             return loadBalancer.next(serviceName,addressList);
-        addressList=addressFinder.getAddressList(serviceName);
+        addressList= addressDicover.getAddressList(serviceName);
         System.out.println(serviceName+":"+addressList);
         if(CollectionUtils.isEmpty(addressList))//找不到地址
             return null;

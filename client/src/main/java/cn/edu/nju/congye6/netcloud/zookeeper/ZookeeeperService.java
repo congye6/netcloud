@@ -61,7 +61,6 @@ public class ZookeeeperService {
     public static List<String> getChildren(String path, Watcher watcher) {
         ZooKeeper zookeeper = ZookeeperManager.getZookeeper();
         try {
-
             return zookeeper.getChildren(path,watcher);
         } catch (KeeperException e) {
             e.printStackTrace();
