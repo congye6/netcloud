@@ -30,7 +30,9 @@ public class RpcServiceChangeWatcher implements Watcher{
         if(Event.EventType.NodeChildrenChanged!=event.getType())//只关心子节点变化
             return;
         //TODO 更新时正好又有通知
+        //TODO 关闭，断开watcher
         List<String> addressList=ZookeeeperService.getChildren(event.getPath(),this);
+        channelPool.updateChannel(addressList);
         LOGGER.info(event.getPath()+" update channel");
     }
 }

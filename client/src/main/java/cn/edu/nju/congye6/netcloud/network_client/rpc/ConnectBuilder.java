@@ -1,9 +1,7 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -18,6 +16,11 @@ public class ConnectBuilder {
     private static final String ADDRESS_SPLITER = ":";
 
     /**
+     * 建立连接超时时间
+     */
+    private static final int CONNECT_TIMEOUT =10000;
+
+    /**
      * 监听可用时间的多个selctor的线程池
      */
     private static final NioEventLoopGroup SELECTORS = new NioEventLoopGroup(4);
@@ -27,16 +30,16 @@ public class ConnectBuilder {
      *
      * @param address
      */
-    public Channel build(String address) {
+    public void build(String address,ChannelPool channelPool) {
         if (StringUtils.isEmpty(address)) {
             LOGGER.error("address empty");
-            return null;
+            return;
         }
 
         String[] args = address.split(ADDRESS_SPLITER);
         if (args.length != 2) {
             LOGGER.error("address format wrong,address:" + address);
-            return null;
+            return;
         }
 
         String host = args[0];
@@ -45,13 +48,14 @@ public class ConnectBuilder {
             port = Integer.parseInt(args[1]);
         } catch (Exception e) {
             LOGGER.error("wrong port:" + args[1], e);
-            return null;
+            return;
         }
-        return build(host, port);
+        build(host, port,channelPool);
     }
 
-    public Channel build(String host, int port) {
+    public void build(String host, int port,ChannelPool channelPool) {
         Bootstrap b = new Bootstrap();
+        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT);//设置超时时间
         b.channel(NioSocketChannel.class)// 使用NioSocketChannel来作为连接用的channel类
                 .group(SELECTORS)//设置selectors线程池
                 .handler(new ChannelInitializer<SocketChannel>() { // 绑定连接初始化器
@@ -64,14 +68,14 @@ public class ConnectBuilder {
                     }
                 });
         LOGGER.info("created to " + host + ":" + port);
-        try {
-            ChannelFuture cf = b.connect(host, port).sync(); // 异步连接服务器
-            return cf.channel();
-        } catch (InterruptedException e) {
-            LOGGER.error("connect error", e);
-        }
-        LOGGER.info("connected..."); // 连接完成
-        return null;
+        ChannelFuture channelFuture=b.connect(host, port);// 异步连接服务器
+        channelFuture.addListener(future -> {
+            if(future.isCancelled()){
+                //TODO 连接失败，重试
+                return;
+            }
+            channelPool.addChannel(host+ADDRESS_SPLITER+port,channelFuture.channel());
+        });
     }
 
 }
