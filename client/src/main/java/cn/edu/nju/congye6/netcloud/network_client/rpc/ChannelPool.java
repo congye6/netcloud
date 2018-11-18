@@ -6,14 +6,10 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 单个服务连接池
@@ -41,6 +37,18 @@ public class ChannelPool {
     private Map<String,Channel> channelMap = new ConcurrentHashMap<>();
 
     /**
+     * 负载均衡当前的下标
+     */
+    private AtomicLong currentIndex=new AtomicLong(0);
+
+    /**
+     * 线程安全的arraylist
+     * 备选：Collections.synchronizedList 写操作性能更好，但是读操作使用了锁，性能比这个差
+     * 因为很少需要修改，并且读的次数更多所以选择CopyOnWriteArrayList
+     */
+    private List<Channel> channels=new CopyOnWriteArrayList<>();
+
+    /**
      * 本服务的名称
      */
     private String serviceName;
@@ -58,14 +66,34 @@ public class ChannelPool {
 
     /**
      * 根据地址获取channel
-     * TODO
+     * 没有channel时阻塞
+     * get的同时有可能在add
      * @param address
      * @return
      */
     public Channel getChannel(){
-        return null;
+        if(channels.isEmpty()){//当前map为空，等待连接成功
+            synchronized (this){
+                try {
+                    this.wait(1000);//超时则唤醒
+                } catch (InterruptedException e) {
+                    LOGGER.warn("get channel wait,interrupted",e);
+                }
+            }
+        }
+        //TODO 此时删除连接，可能出现无法使用的channel
+        if(channels.isEmpty())//暂时没有连接
+            return null;
+        long index=currentIndex.getAndIncrement()%channels.size();
+        return channels.get((int)index);
     }
 
+    /**
+     * 更新channel
+     * 与所有未连接地址建立连接
+     * 删除所有已断开的连接
+     * @param addressList
+     */
     public void updateChannel(List<String> addressList){
         //添加新地址的channel
         for(String address:addressList){
@@ -82,8 +110,18 @@ public class ChannelPool {
         }
     }
 
+    /**
+     * 添加channel到map和channels
+     * 通知所有因为没有channel而阻塞的线程
+     * @param address
+     * @param channel
+     */
     void addChannel(String address, Channel channel){
-
+        channelMap.put(address,channel);
+        channels.add(channel);
+        synchronized (this){//通知所有因为没有channel而阻塞的线程
+            this.notifyAll();
+        }
     }
 
     /**
@@ -95,5 +133,6 @@ public class ChannelPool {
         if(channel!=null)
             channel.close();
         channelMap.remove(address);
+        channels.remove(channel);
     }
 }
