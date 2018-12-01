@@ -3,17 +3,18 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 import cn.edu.nju.congye6.netcloud.service_router.AddressDicover;
 import cn.edu.nju.congye6.netcloud.zookeeper.RpcServiceChangeWatcher;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import org.apache.log4j.Logger;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 单个服务连接池
  * 获取channel,channel断线重连，channel负载均衡
+ * TODO channelPool关闭
  * Created by cong on 2018-11-13.
  */
 public class ChannelPool {

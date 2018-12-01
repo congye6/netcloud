@@ -21,15 +21,11 @@ public class RpcClient {
 
     private static final String SOURCE_SERVICE_KEY = "cn.edu.nju.congye6.cloudservice.name";
 
-    /**
-     * 获取服务地址
-     */
-    private CloudServiceRouter serviceRouter = CloudServiceRouter.getServiceRouter();
 
     /**
      * 连接池
      */
-    private ChannelPool channelPool = ChannelPool.getInstance();
+    private ChannelPoolManager channelPoolManager = new ChannelPoolManager();
 
     /**
      * 拦截器执行器
@@ -57,8 +53,8 @@ public class RpcClient {
         pipeline.pipeline(new RpcRequestBuilder(request));
 
         //发起调用
-        String address = serviceRouter.getAddress(serviceName);
-        Channel channel = channelPool.getChannel(address);//获取channel
+        ChannelPool channelPool=channelPoolManager.getChannelPool(serviceName);
+        Channel channel = channelPool.getChannel();//获取channel
         ResponseHandler responseHandler=channel.pipeline().get(ResponseHandler.class);
         RpcFuture future=new RpcFuture();
         responseHandler.addRpcFuture(request.getRequestId(),future);//设置future，以便异步获取结果

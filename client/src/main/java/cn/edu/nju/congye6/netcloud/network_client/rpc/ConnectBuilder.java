@@ -62,7 +62,6 @@ public class ConnectBuilder {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new RpcEncoder())//编码器，用于请求
-                                .addLast(new LengthFieldBasedFrameDecoder(65536, 0, 4, 0, 0))//tcp粘包处理
                                 .addLast(new RpcDecoder(RpcResponse.class))//解码器,每次获取到一个完整的响应才交给下一个handler
                                 .addLast(new ResponseHandler());
                     }

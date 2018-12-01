@@ -7,6 +7,8 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * 地址改变时通知rpcChannel
@@ -21,6 +23,11 @@ public class RpcServiceChangeWatcher implements Watcher{
      */
     private ChannelPool channelPool;
 
+    /**
+     * 单线程执行更新任务
+     */
+    private static final Executor UPDATE_EXECUTOR= Executors.newSingleThreadExecutor();
+
     public RpcServiceChangeWatcher(ChannelPool channelPool) {
         this.channelPool = channelPool;
     }
@@ -29,10 +36,12 @@ public class RpcServiceChangeWatcher implements Watcher{
     public void process(WatchedEvent event) {
         if(Event.EventType.NodeChildrenChanged!=event.getType())//只关心子节点变化
             return;
-        //TODO 更新时正好又有通知
+
         //TODO 关闭，断开watcher
         List<String> addressList=ZookeeeperService.getChildren(event.getPath(),this);
-        channelPool.updateChannel(addressList);
+        //异步执行,防止阻塞zookeeper线程
+        //单线程执行,防止更新时正好又有通知
+        UPDATE_EXECUTOR.execute(() -> channelPool.updateChannel(addressList));
         LOGGER.info(event.getPath()+" update channel");
     }
 }

@@ -3,7 +3,6 @@ package cn.edu.nju.congye6.netcloud.service_register;
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.network_client.http.HttpClient;
 import cn.edu.nju.congye6.netcloud.network_client.rpc.RpcClient;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -14,9 +13,9 @@ import java.lang.reflect.Method;
  */
 public class CloudServiceHandler implements InvocationHandler{
 
-    private HttpClient httpClient=new HttpClient();
+    private static final HttpClient HTTP_CLIENT =new HttpClient();
 
-    private RpcClient rpcClient=new RpcClient();
+    private static final RpcClient RPC_CLIENT =new RpcClient();
     /**
      * 调用的服务名称
      */
@@ -31,12 +30,12 @@ public class CloudServiceHandler implements InvocationHandler{
         //http请求
         RequestMapping requestMapping=method.getAnnotation(RequestMapping.class);
         if(requestMapping!=null)
-            return httpClient.send(method.getReturnType(),args,serviceName,requestMapping);
+            return HTTP_CLIENT.send(method.getReturnType(),args,serviceName,requestMapping);
 
         //rpc请求
         RpcService rpcService=method.getAnnotation(RpcService.class);
         if(rpcService!=null)
-            return rpcClient.send(serviceName,args,rpcService);
+            return RPC_CLIENT.send(serviceName,args,rpcService);
 
         return null;
     }
