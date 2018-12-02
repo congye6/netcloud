@@ -68,7 +68,7 @@ public class RpcFuture{
      * 设置future的结果
      * @param response
      */
-    public void set(RpcResponse response){
+    void set(RpcResponse response){
         this.response=response;
         countDownLatch.countDown();//实发latch，唤醒所有等待线程
     }

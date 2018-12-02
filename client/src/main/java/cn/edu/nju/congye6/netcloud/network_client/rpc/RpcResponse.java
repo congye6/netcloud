@@ -1,5 +1,7 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Map;
 
 /**
@@ -37,6 +39,10 @@ public class RpcResponse {
 
     public void setResponse(String response) {
         this.response = response;
+    }
+
+    public <T> T getResponse(Class<T> type){
+        return JSONObject.parseObject(response,type);
     }
 
     public Map<String, String> getHeaders() {

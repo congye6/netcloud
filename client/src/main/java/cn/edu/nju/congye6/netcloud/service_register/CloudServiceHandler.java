@@ -35,7 +35,7 @@ public class CloudServiceHandler implements InvocationHandler{
         //rpc请求
         RpcService rpcService=method.getAnnotation(RpcService.class);
         if(rpcService!=null)
-            return RPC_CLIENT.send(serviceName,args,rpcService);
+            return RPC_CLIENT.send(serviceName,args,rpcService,method.getReturnType());
 
         return null;
     }

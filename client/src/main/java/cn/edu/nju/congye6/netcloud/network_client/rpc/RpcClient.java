@@ -9,6 +9,7 @@ import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
 import cn.edu.nju.congye6.netcloud.util.UuidUtil;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
+import org.apache.log4j.Logger;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -18,6 +19,8 @@ import java.util.*;
  * Created by cong on 2018-10-24.
  */
 public class RpcClient {
+
+    private static final Logger LOGGER=Logger.getLogger(RpcClient.class);
 
     private static final String SOURCE_SERVICE_KEY = "cn.edu.nju.congye6.cloudservice.name";
 
@@ -32,7 +35,7 @@ public class RpcClient {
      */
     private RequestInterceptorPipeline pipeline=new RequestInterceptorPipeline();
 
-    public Object send(String serviceName, Object[] params, RpcService rpcService) throws Exception {
+    public Object send(String serviceName, Object[] params, RpcService rpcService,Class<?> returnType) throws Exception {
         RpcRequest request = new RpcRequest();
         request.setRpcId(UuidUtil.uuid());//requestid 为 uuid
 
@@ -55,12 +58,20 @@ public class RpcClient {
         //发起调用
         ChannelPool channelPool=channelPoolManager.getChannelPool(serviceName);
         Channel channel = channelPool.getChannel();//获取channel
+        if(channel==null){
+            LOGGER.error("连接超时,没有可用channel");
+            throw new Exception("连接超时,没有可用channel");
+        }
         ResponseHandler responseHandler=channel.pipeline().get(ResponseHandler.class);
         RpcFuture future=new RpcFuture();
         responseHandler.addRpcFuture(request.getRequestId(),future);//设置future，以便异步获取结果
         channel.writeAndFlush(request);
-        //TODO 异步获取future
-        return future.get();
+
+        if(RpcFuture.class==returnType)//要求返回future
+            return future;
+        //否则同步获取结果,解析json
+        String json=future.get().getResponse();
+        return JSONObject.parseObject(json,returnType);
     }
 
     /**
