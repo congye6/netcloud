@@ -2,6 +2,7 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.apache.log4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
@@ -12,6 +13,8 @@ import java.util.*;
  * Created by cong on 2018-11-13.
  */
 public class ResponseHandler extends ChannelInboundHandlerAdapter {
+
+    private static final Logger LOGGER=Logger.getLogger(ResponseHandler.class);
 
     /**
      * requestId -> rpcFuture
@@ -25,6 +28,10 @@ public class ResponseHandler extends ChannelInboundHandlerAdapter {
             return;
         RpcResponse rpcResponse=(RpcResponse)msg;
         RpcFuture future=responseMap.get(rpcResponse.getRequestId());//根据requestId获取future
+        if(future==null){
+            LOGGER.warn("accept reponse without future,requestId:"+rpcResponse.getRequestId());
+            return;
+        }
         future.set(rpcResponse);//设置响应
         responseMap.remove(rpcResponse.getRequestId());//已经响应，移除future
     }

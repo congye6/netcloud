@@ -1,13 +1,14 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
+import io.netty.channel.ChannelFuture;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 服务器异步返回响应，使用future接收结果
@@ -32,11 +33,30 @@ public class RpcFuture{
     private volatile RpcResponse response;
 
     /**
+     * 发送消息的future
+     */
+    private ChannelFuture requestFuture;
+
+    /**
+     * 是否取消
+     */
+    private volatile boolean isCancel=false;
+
+    /**
      * 是否已经完成
      * @return
      */
     public boolean isDone() {
         return response!=null;
+    }
+
+    public boolean isCancelled(){
+        return requestFuture.isCancelled()||isCancel;
+    }
+
+    public void cancel(){
+        isCancel=true;
+        countDownLatch.countDown();
     }
 
     /**
@@ -46,7 +66,8 @@ public class RpcFuture{
      * @throws ExecutionException
      */
     public RpcResponse get() throws InterruptedException, ExecutionException {
-
+        if(isCancelled())
+            return null;
         if(!isDone())
             countDownLatch.await();
 
@@ -63,7 +84,8 @@ public class RpcFuture{
      * @throws TimeoutException
      */
     public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-
+        if(isCancelled())
+            return null;
         if(!isDone()){
             boolean success=countDownLatch.await(timeout,unit);
             if(!success)
@@ -79,8 +101,8 @@ public class RpcFuture{
     void set(RpcResponse response){
         this.response=response;
         countDownLatch.countDown();//实发latch，唤醒所有等待线程
-        for(RpcCallBack callBack:callBacks){
-            callBack.callBack(response.getResponse(),response.getHeaders());
+        for(RpcCallBack callBack:callBacks){//异步执行，避免用户操作阻塞
+            RpcTaskExecutor.excute(()->callBack.callBack(response.getResponse(),response.getHeaders()));
         }
     }
 
@@ -89,11 +111,15 @@ public class RpcFuture{
      * @param callBack
      */
     public synchronized void addCallBack(RpcCallBack callBack){
-        if(isDone()){//已经完成，不再添加回调
-            LOGGER.warn("响应已经接收完毕,添加回调函数失败,requestId:"+response.getRequestId());
+        if(isDone()){//已经完成，直接执行
+            RpcTaskExecutor.excute(()->callBack.callBack(response.getResponse(),response.getHeaders()));
             return;
         }
 
         callBacks.add(callBack);
+    }
+
+    void setRequestFuture(ChannelFuture channelFuture){
+        this.requestFuture=channelFuture;
     }
 }

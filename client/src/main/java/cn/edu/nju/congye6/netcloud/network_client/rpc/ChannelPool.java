@@ -76,7 +76,7 @@ public class ChannelPool {
         if(channels.isEmpty()){//当前map为空，等待连接成功
             synchronized (this){
                 try {
-                    this.wait(1000);//超时则唤醒
+                    this.wait(5000);//超时则唤醒
                 } catch (InterruptedException e) {
                     LOGGER.warn("get channel wait,interrupted",e);
                 }
