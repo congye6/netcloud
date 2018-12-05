@@ -16,7 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class ClientApplication {
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext context=SpringApplication.run(ClientApplication.class, args);
-		CloudContextUtil.setApplicationContext(context);
+		SpringApplication.run(ClientApplication.class, args);
+//		CloudContextUtil.setApplicationContext(context);
 	}
 }

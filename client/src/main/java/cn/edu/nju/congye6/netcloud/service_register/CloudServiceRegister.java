@@ -1,6 +1,7 @@
 package cn.edu.nju.congye6.netcloud.service_register;
 
 import cn.edu.nju.congye6.netcloud.annotation.CloudService;
+import cn.edu.nju.congye6.netcloud.util.CloudContextUtil;
 import cn.edu.nju.congye6.netcloud.util.PackageUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;

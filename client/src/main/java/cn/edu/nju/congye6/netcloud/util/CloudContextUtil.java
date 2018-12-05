@@ -9,14 +9,15 @@ import org.springframework.context.ConfigurableApplicationContext;
  * spring上下文管理
  * Created by cong on 2018-11-15.
  */
-public class CloudContextUtil{
+public class CloudContextUtil implements ApplicationContextAware{
 
     /**
      * spring上下文
      */
     private static ApplicationContext applicationContext;
 
-    public static void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
         CloudContextUtil.applicationContext=applicationContext;
     }
 
