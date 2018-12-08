@@ -45,7 +45,7 @@ public class ServiceImporter{
     private List<Object> getControllers(){
         List<Object> controllers=new ArrayList<>();
         ApplicationContext context= CloudContextUtil.getContext();
-        //获取被RestController注解的类
+        //获取被@Controller注解的类,@RestController也是被被@Controller注解的类
         Map<String,Object> beanMap=context.getBeansWithAnnotation(Controller.class);//添加被Controller注解的类
         if(beanMap.values()!=null)
             controllers.addAll(beanMap.values());
