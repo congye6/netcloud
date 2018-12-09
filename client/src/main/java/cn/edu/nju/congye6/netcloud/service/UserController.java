@@ -17,10 +17,9 @@ public class UserController {
 
     @RequestMapping("/test")
     public String test(){
-        User user=new User();
-
-        user.setUserName("cc");
-        userService.addUser(user);
+        User user=userService.getUser("cc");
+        System.out.println(user.getUserName());
+        System.out.println(user.getId());
         return "success";
     }
 

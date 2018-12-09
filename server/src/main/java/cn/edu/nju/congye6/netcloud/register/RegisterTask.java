@@ -49,13 +49,13 @@ public class RegisterTask implements Runnable {
             ZookeeeperService.createNode(servicePath, null, CreateMode.PERSISTENT);
 
         //注册地址节点
-        String address = addressHelper.getAddress();
+        String address = addressHelper.getRpcAddress();
         String path = servicePath + PATH_SPLITER + address;
         ZookeeeperService.createNode(path, null, CreateMode.EPHEMERAL);
-
         Executor failOverThread = Executors.newSingleThreadExecutor();//后台检查重连
         failOverThread.execute(new FailOverTask(path));
     }
+
 
 
 }

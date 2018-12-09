@@ -9,6 +9,8 @@ import org.springframework.util.StringUtils;
  */
 public class AddressHelper {
 
+    private static final String RPC_PORT_KEY = "cn.edu.nju.congye6.rpc.port";
+
     private static final String SERVER_PORT_KEY = "server.port";
 
     private static final String SERVER_ADDRESS_KEY = "server.address";
@@ -26,6 +28,12 @@ public class AddressHelper {
     String getAddress(){
         String ip=getServerAddress();
         String port=getServerPort();
+        return ip+SPLITER+port;
+    }
+
+    String getRpcAddress(){
+        String ip=getServerAddress();
+        String port=PropertyUtil.getProperty(RPC_PORT_KEY);
         return ip+SPLITER+port;
     }
 

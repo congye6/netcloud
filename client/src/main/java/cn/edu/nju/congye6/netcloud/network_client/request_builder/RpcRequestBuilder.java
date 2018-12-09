@@ -27,7 +27,7 @@ public class RpcRequestBuilder implements RequestBuilder{
 
     public RpcRequest build(RpcService rpcService,Object[] params) throws Exception{
         request = new RpcRequest();
-        request.setRpcId(UuidUtil.uuid());//requestid 为 uuid
+        request.setRequestId(UuidUtil.uuid());//requestid 为 uuid
 
         String rpcId=rpcService.rpcId();
         if (StringUtils.isEmpty(rpcId))

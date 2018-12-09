@@ -20,7 +20,6 @@ public class ServiceImporter{
 
     private RpcServiceDispatcher dispatcher=RpcServiceDispatcher.getInstance();
 
-    @PostConstruct
     public void selectRpcServices(){
         List<Object> controllers=getControllers();
         for(Object controller:controllers){
@@ -28,7 +27,6 @@ public class ServiceImporter{
             Class<?> controllerClazz=controller.getClass();
             Method[] methods=controllerClazz.getDeclaredMethods();
             for(Method method:methods){
-                System.out.println(method.getName());
                 RpcCloudService annotation=method.getAnnotation(RpcCloudService.class);
                 if(annotation==null)
                     continue;

@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * 解码器
  * 对象使用json进行编码，前四字节为长度
+ * 可以使用LengthFieldBasedFrameDecoder代替
  * Created by cong on 2018-11-11.
  */
 public class RpcDecoder extends ByteToMessageDecoder {

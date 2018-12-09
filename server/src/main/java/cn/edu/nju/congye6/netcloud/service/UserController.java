@@ -23,6 +23,7 @@ public class UserController {
     public User getUser(String username){
         User user=new User();
         user.setUserName(username);
+        user.setId("1111");
         return user;
     }
 

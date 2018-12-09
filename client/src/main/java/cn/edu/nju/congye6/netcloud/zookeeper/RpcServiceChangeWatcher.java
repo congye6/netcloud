@@ -36,7 +36,7 @@ public class RpcServiceChangeWatcher implements Watcher{
     public void process(WatchedEvent event) {
         if(Event.EventType.NodeChildrenChanged!=event.getType())//只关心子节点变化
             return;
-
+        LOGGER.info("server updating:"+event.getPath()+" "+event.getType());
         //TODO 关闭，断开watcher
         List<String> addressList=ZookeeeperService.getChildren(event.getPath(),this);
         //异步执行,防止阻塞zookeeper线程
