@@ -23,7 +23,6 @@ public class ServiceImporter{
     public void selectRpcServices(){
         List<Object> controllers=getControllers();
         for(Object controller:controllers){
-            System.out.println(controller);
             Class<?> controllerClazz=controller.getClass();
             Method[] methods=controllerClazz.getDeclaredMethods();
             for(Method method:methods){

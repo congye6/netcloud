@@ -4,6 +4,7 @@ import cn.edu.nju.congye6.netcloud.service_router.AddressDicover;
 import cn.edu.nju.congye6.netcloud.zookeeper.RpcServiceChangeWatcher;
 import io.netty.channel.Channel;
 import org.apache.log4j.Logger;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by cong on 2018-11-13.
  */
 public class ChannelPool {
-
-    private static final Logger LOGGER=Logger.getLogger(ChannelPool.class);
 
     /**
      * 建立连接类
@@ -78,15 +77,45 @@ public class ChannelPool {
                 try {
                     this.wait(5000);//超时则唤醒
                 } catch (InterruptedException e) {
-                    LOGGER.warn("get channel wait,interrupted",e);
+                    System.out.println("get channel wait,interrupted");
                 }
             }
         }
         //TODO 此时删除连接，可能出现无法使用的channel
         if(channels.isEmpty())//暂时没有连接
             return null;
+        System.out.println("channel size:"+channels.size());
         long index=currentIndex.getAndIncrement()%channels.size();
-        return channels.get((int)index);
+        Channel channel=channels.get((int)index);
+        if(!channel.isActive()){//连接已断开，重新连接
+            try{
+                channel=reconnect(findAddress(channel));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if(channel==null)//重连失败，调用其他channel
+                return getChannel();
+        }
+        return channel;
+    }
+
+
+
+    /**
+     * 断线重连
+     * @param address
+     */
+    private Channel reconnect(String address){
+        if(StringUtils.isEmpty(address))
+            return null;
+        if(channelMap.containsKey(address)){//已存在,删除已断开的连接
+            removeChannel(address);
+        }
+        Channel newChannel=CONNECT_BUILDER.buildSync(address);//同步获取channel
+        if(newChannel==null)
+            return null;
+        addChannel(address,newChannel);
+        return newChannel;
     }
 
     /**
@@ -135,5 +164,18 @@ public class ChannelPool {
             channel.close();
         channelMap.remove(address);
         channels.remove(channel);
+    }
+
+    /**
+     * 从map中根据channel查找地址
+     * @param channel
+     * @return
+     */
+    private String findAddress(Channel channel){
+        for(Map.Entry<String,Channel> entry:channelMap.entrySet()){
+            if(entry.getValue()==channel)
+                return entry.getKey();
+        }
+        return null;
     }
 }

@@ -16,8 +16,6 @@ import java.util.concurrent.Executors;
  */
 public class RpcServiceChangeWatcher implements Watcher{
 
-    private static final Logger LOGGER=Logger.getLogger(RpcServiceChangeWatcher.class);
-
     /**
      * 更新时通知的连接池
      */
@@ -36,12 +34,11 @@ public class RpcServiceChangeWatcher implements Watcher{
     public void process(WatchedEvent event) {
         if(Event.EventType.NodeChildrenChanged!=event.getType())//只关心子节点变化
             return;
-        LOGGER.info("server updating:"+event.getPath()+" "+event.getType());
         //TODO 关闭，断开watcher
         List<String> addressList=ZookeeeperService.getChildren(event.getPath(),this);
         //异步执行,防止阻塞zookeeper线程
         //单线程执行,防止更新时正好又有通知
-        UPDATE_EXECUTOR.execute(() -> channelPool.updateChannel(addressList));
-        LOGGER.info(event.getPath()+" update channel");
+//        UPDATE_EXECUTOR.execute(() -> channelPool.updateChannel(addressList));
+        System.out.println(event.getPath()+" update channel");
     }
 }
