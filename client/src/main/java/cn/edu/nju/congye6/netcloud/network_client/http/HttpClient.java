@@ -1,29 +1,27 @@
 package cn.edu.nju.congye6.netcloud.network_client.http;
 
 import cn.edu.nju.congye6.netcloud.network_client.request_builder.HttpRequestBuilder;
-import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestBuilder;
-import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestInterceptor;
 import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestInterceptorPipeline;
 import cn.edu.nju.congye6.netcloud.service_router.CloudServiceRouter;
-import cn.edu.nju.congye6.netcloud.util.CloudContextUtil;
 import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.squareup.okhttp.*;
-import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by cong on 2018-10-24.
  */
 public class HttpClient {
 
-    private static final Logger LOGGER=Logger.getLogger(HttpClient.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(HttpClient.class);
 
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json");
 

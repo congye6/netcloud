@@ -1,8 +1,6 @@
 package cn.edu.nju.congye6.netcloud.zookeeper;
 
-import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.network_client.rpc.ChannelPool;
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 

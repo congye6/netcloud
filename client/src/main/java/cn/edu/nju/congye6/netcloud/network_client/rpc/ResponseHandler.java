@@ -2,7 +2,8 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
@@ -14,7 +15,7 @@ import java.util.*;
  */
 public class ResponseHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger LOGGER=Logger.getLogger(ResponseHandler.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(ResponseHandler.class);
 
     /**
      * requestId -> rpcFuture

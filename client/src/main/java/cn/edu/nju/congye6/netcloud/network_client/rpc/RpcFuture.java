@@ -1,7 +1,8 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import io.netty.channel.ChannelFuture;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class RpcFuture{
 
-    private static final Logger LOGGER=Logger.getLogger(RpcFuture.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(RpcFuture.class);
 
     /**
      * 加锁

@@ -23,6 +23,7 @@ public class ChannelPoolManager {
      * @return
      */
     public ChannelPool getChannelPool(String serviceName){
+        long start=System.currentTimeMillis();
         ChannelPool channelPool=channelPoolMap.get(serviceName);
         if(channelPool==null){//pool不存在
             synchronized (this){//加锁，防止并发添加
@@ -33,6 +34,8 @@ public class ChannelPoolManager {
                 }
             }
         }
+        long end=System.currentTimeMillis();
+        System.out.println("ChannelPoolManager init pool :"+(end-start));
         return channelPool;
     }
 

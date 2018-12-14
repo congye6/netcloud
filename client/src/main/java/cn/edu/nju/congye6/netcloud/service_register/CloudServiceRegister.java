@@ -3,7 +3,8 @@ package cn.edu.nju.congye6.netcloud.service_register;
 import cn.edu.nju.congye6.netcloud.annotation.CloudService;
 import cn.edu.nju.congye6.netcloud.util.CloudContextUtil;
 import cn.edu.nju.congye6.netcloud.util.PackageUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
 
-    private static final Logger LOGGER=Logger.getLogger(CloudServiceRegister.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(CloudServiceRegister.class);
 
     private PackageUtil packageUtil=new PackageUtil();
 

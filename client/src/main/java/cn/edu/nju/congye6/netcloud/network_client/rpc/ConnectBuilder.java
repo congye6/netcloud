@@ -6,12 +6,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 public class ConnectBuilder {
 
-    private static final Logger LOGGER = Logger.getLogger(ConnectBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectBuilder.class);
 
     private static final String ADDRESS_SPLITER = ":";
 
@@ -91,7 +92,7 @@ public class ConnectBuilder {
                                 .addLast(new ResponseHandler());
                     }
                 });
-        System.out.println("created to " + host + ":" + port);
+        LOGGER.info("created channel to " + host + ":" + port);
         return b.connect(host, port);
     }
 

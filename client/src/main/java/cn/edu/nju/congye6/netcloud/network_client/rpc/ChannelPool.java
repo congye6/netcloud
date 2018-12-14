@@ -3,7 +3,8 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 import cn.edu.nju.congye6.netcloud.service_router.AddressDicover;
 import cn.edu.nju.congye6.netcloud.zookeeper.RpcServiceChangeWatcher;
 import io.netty.channel.Channel;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by cong on 2018-11-13.
  */
 public class ChannelPool {
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(ChannelPool.class);
 
     /**
      * 建立连接类
@@ -77,21 +80,21 @@ public class ChannelPool {
                 try {
                     this.wait(5000);//超时则唤醒
                 } catch (InterruptedException e) {
-                    System.out.println("get channel wait,interrupted");
+                    LOGGER.error("get channel wait,interrupted",e);
                 }
             }
         }
         //TODO 此时删除连接，可能出现无法使用的channel
         if(channels.isEmpty())//暂时没有连接
             return null;
-        System.out.println("channel size:"+channels.size());
+        LOGGER.info("channel size:"+channels.size());
         long index=currentIndex.getAndIncrement()%channels.size();
         Channel channel=channels.get((int)index);
         if(!channel.isActive()){//连接已断开，重新连接
             try{
                 channel=reconnect(findAddress(channel));
             }catch (Exception e){
-                e.printStackTrace();
+                LOGGER.error("reconnect fail",e);
             }
             if(channel==null)//重连失败，调用其他channel
                 return getChannel();

@@ -1,19 +1,14 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
-import cn.edu.nju.congye6.netcloud.enumeration.RpcContentType;
-import cn.edu.nju.congye6.netcloud.network_client.request_builder.RequestInterceptorPipeline;
 import cn.edu.nju.congye6.netcloud.network_client.request_builder.RpcRequestBuilder;
-import cn.edu.nju.congye6.netcloud.service_router.CloudServiceRouter;
-import cn.edu.nju.congye6.netcloud.util.PropertyUtil;
-import cn.edu.nju.congye6.netcloud.util.UuidUtil;
-import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import org.apache.log4j.Logger;
-import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RpcClient {
 
-    private static final Logger LOGGER=Logger.getLogger(RpcClient.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(RpcClient.class);
 
     private static final long MAX_TIME_OUT=10;
 

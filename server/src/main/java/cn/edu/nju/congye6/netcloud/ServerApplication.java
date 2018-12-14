@@ -1,7 +1,8 @@
 package cn.edu.nju.congye6.netcloud;
 
 import cn.edu.nju.congye6.netcloud.annotation.EnableCloudServer;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Configuration
 public class ServerApplication {
 
-    private static final Logger LOGGER=Logger.getLogger(ServerApplication.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(ServerApplication.class);
 
 
 
