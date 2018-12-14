@@ -2,6 +2,8 @@ package cn.edu.nju.congye6.netcloud.register;
 
 import cn.edu.nju.congye6.netcloud.network.NettyServer;
 import cn.edu.nju.congye6.netcloud.service_register.ServiceImporter;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 
@@ -10,8 +12,11 @@ import javax.annotation.PostConstruct;
  */
 public class ServerStarter {
 
+    private static final Logger LOGGER=Logger.getLogger(ServerStarter.class);
+
     @PostConstruct
     public void start() throws Exception {
+        LOGGER.info("server starting...");
         ServiceImporter importer=new ServiceImporter();
         importer.selectRpcServices();
 

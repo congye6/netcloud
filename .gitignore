@@ -74,3 +74,4 @@ server/.mvn/wrapper/maven-wrapper.jar
 register/.mvn/wrapper/maven-wrapper.jar
 register/.mvn/wrapper/maven-wrapper.properties
 register/mvnw
+server/logs/log.log

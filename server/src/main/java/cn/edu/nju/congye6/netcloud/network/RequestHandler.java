@@ -36,9 +36,11 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
         RpcResponse response=new RpcResponse();
         response.setRequestId(request.getRequestId());
         try{
+            LOGGER.info("request:"+request.getRpcId());
             Object result=dispatcher.invokeService(request.getRpcId(),request.getParams(),contentType);
             response.setResponse(JSONObject.toJSONString(result));
             response.setSuccess(true);
+            LOGGER.info("response:"+response.getResponse());
         }catch (Exception e){
             String message="invoke service error,rpcId:"+request.getRpcId();
             LOGGER.error(message,e);

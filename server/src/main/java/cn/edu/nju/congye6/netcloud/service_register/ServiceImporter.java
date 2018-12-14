@@ -4,9 +4,6 @@ import cn.edu.nju.congye6.netcloud.annotation.RpcCloudService;
 import cn.edu.nju.congye6.netcloud.util.CloudContextUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

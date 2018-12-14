@@ -4,6 +4,7 @@ import cn.edu.nju.congye6.netcloud.register.CloudServiceRegister;
 import cn.edu.nju.congye6.netcloud.register.ServerStarter;
 import cn.edu.nju.congye6.netcloud.service_register.ServiceImporter;
 import cn.edu.nju.congye6.netcloud.util.CloudContextUtil;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;

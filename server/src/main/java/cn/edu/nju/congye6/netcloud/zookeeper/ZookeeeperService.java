@@ -66,7 +66,7 @@ public class ZookeeeperService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return new ArrayList<String>();
     }
 
 

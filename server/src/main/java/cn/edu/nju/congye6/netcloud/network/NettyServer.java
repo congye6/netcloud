@@ -8,8 +8,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 
 public class NettyServer {
+
+    private static final Logger LOGGER=Logger.getLogger(NettyServer.class);
 
     /**
      * 长度字段占多少字节
@@ -18,7 +22,9 @@ public class NettyServer {
 
     private static final String RPC_PORT_KEY = "cn.edu.nju.congye6.rpc.port";
 
+
     public void startServerInPort() throws Exception{
+
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try{
