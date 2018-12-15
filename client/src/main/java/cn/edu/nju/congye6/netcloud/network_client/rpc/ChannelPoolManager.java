@@ -1,5 +1,8 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 
@@ -10,6 +13,8 @@ import java.util.*;
  * Created by cong on 2018-11-16.
  */
 public class ChannelPoolManager {
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(ChannelPoolManager.class);
 
     /**
      * 管理所有服务的连接池
@@ -23,19 +28,18 @@ public class ChannelPoolManager {
      * @return
      */
     public ChannelPool getChannelPool(String serviceName){
-        long start=System.currentTimeMillis();
         ChannelPool channelPool=channelPoolMap.get(serviceName);
         if(channelPool==null){//pool不存在
             synchronized (this){//加锁，防止并发添加
                 channelPool=channelPoolMap.get(serviceName);
                 if(channelPool==null){
+                    LOGGER.info("creating channel pool of "+serviceName);
                     channelPool=new ChannelPool(serviceName);
                     channelPoolMap.put(serviceName,channelPool);
+                    LOGGER.info("channel pool of "+serviceName+" created");
                 }
             }
         }
-        long end=System.currentTimeMillis();
-        System.out.println("ChannelPoolManager init pool :"+(end-start));
         return channelPool;
     }
 

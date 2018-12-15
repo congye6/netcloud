@@ -23,7 +23,6 @@ public class ServerApplication {
     public static void main(String[] args){
         LOGGER.info("server starting...");
         ApplicationContext context=new ClassPathXmlApplicationContext("spring.xml");
-        System.out.println(context.getEnvironment().getProperty("cn.edu.nju.congye6.rpc.port"));;
     }
 
 }

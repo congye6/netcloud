@@ -29,17 +29,8 @@ public class RpcClient {
 
 
     public Object send(String serviceName, Object[] params, RpcService rpcService,Class<?> returnType) throws Exception {
-        boolean hasCallBack=rpcService.hasCallBack();
-        List<RpcCallBack> callBacks=null;
-        if(hasCallBack){//有回调函数
-            try {
-                callBacks=(List<RpcCallBack>)params[params.length-1];
-                params=Arrays.copyOf(params,params.length-1);
-            }catch (Exception e){
-                hasCallBack=false;//获取回调失败
-                LOGGER.warn("callback添加异常,serviceName:"+serviceName);
-            }
-        }
+        RpcFuture future=new RpcFuture();
+        CallBackBuilder.buildCallBack(rpcService,future,params);
 
         RpcRequestBuilder requestBuilder=new RpcRequestBuilder();
         RpcRequest request=requestBuilder.build(rpcService,params);
@@ -52,12 +43,6 @@ public class RpcClient {
             throw new Exception("连接超时,没有可用channel");
         }
         ResponseHandler responseHandler=channel.pipeline().get(ResponseHandler.class);
-        RpcFuture future=new RpcFuture();
-        if(hasCallBack){//添加callback
-            for(RpcCallBack callBack:callBacks){
-                future.addCallBack(callBack);
-            }
-        }
         responseHandler.addRpcFuture(request.getRequestId(),future);//设置future，以便异步获取结果
         ChannelFuture channelFuture=channel.writeAndFlush(request);
         future.setRequestFuture(channelFuture);

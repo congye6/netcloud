@@ -92,6 +92,7 @@ public class ChannelPool {
         Channel channel=channels.get((int)index);
         if(!channel.isActive()){//连接已断开，重新连接
             try{
+                channel.close();
                 channel=reconnect(findAddress(channel));
             }catch (Exception e){
                 LOGGER.error("reconnect fail",e);
