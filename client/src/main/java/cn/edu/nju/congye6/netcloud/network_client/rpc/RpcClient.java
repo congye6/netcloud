@@ -2,6 +2,7 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.network_client.request_builder.RpcRequestBuilder;
+import cn.edu.nju.congye6.netcloud.util.SleepUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ public class RpcClient {
 
     private static final long MAX_TIME_OUT=10;
 
+    private static final int RETRY_SLEEP_TIME=1000;
+
 
     /**
      * 连接池
@@ -28,6 +31,15 @@ public class RpcClient {
     private ChannelPoolManager channelPoolManager = new ChannelPoolManager();
 
 
+    /**
+     * 动态代理发起rpc调用
+     * @param serviceName 服务名称
+     * @param params      方法参数
+     * @param rpcService  方法注解
+     * @param returnType  返回值类型
+     * @return            根据返回值类型解析返回值，如果是RpcFuture将直接返回future
+     * @throws Exception
+     */
     public Object send(String serviceName, Object[] params, RpcService rpcService,Class<?> returnType) throws Exception {
         RpcFuture future=new RpcFuture();
         CallBackBuilder.buildCallBack(rpcService,future,params);
@@ -35,7 +47,35 @@ public class RpcClient {
         RpcRequestBuilder requestBuilder=new RpcRequestBuilder();
         RpcRequest request=requestBuilder.build(rpcService,params);
 
-        //发起调用
+        int retryTimes=rpcService.retryTimes();
+        boolean success=false;
+        Object result=null;
+        //发起调用,失败进行重试
+        while(!success&&retryTimes>=0) {//还没成功并且还有重试次数
+            try {
+                result = invoke(serviceName, returnType, future, request);
+                success = true;
+            } catch (Exception e) {
+                LOGGER.warn("invoke error,retryTimes:" + retryTimes,e);
+                if(retryTimes==0)//不可再重试
+                    throw e;
+                SleepUtil.sleep(RETRY_SLEEP_TIME);//睡眠一定时间再重试
+                retryTimes--;//异常重试，次数减一
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 发起rpc调用
+     * @param serviceName
+     * @param returnType
+     * @param future
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private Object invoke(String serviceName, Class<?> returnType, RpcFuture future, RpcRequest request) throws Exception {
         ChannelPool channelPool=channelPoolManager.getChannelPool(serviceName);
         Channel channel = channelPool.getChannel();//获取channel
         if(channel==null){
@@ -52,7 +92,6 @@ public class RpcClient {
         RpcResponse response=future.get(MAX_TIME_OUT, TimeUnit.SECONDS);
         return response.getResponse(returnType);
     }
-
 
 
 }

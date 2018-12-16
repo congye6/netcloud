@@ -20,7 +20,7 @@ public interface UserCloudService {
     @RequestMapping(value = "/addUser")
     public String addUser(User user);
 
-    @RpcService(rpcId = "user.getUser",contentType = RpcContentType.PLAIN)
+    @RpcService(rpcId = "user.getUser",contentType = RpcContentType.PLAIN,retryTimes = 1)
     public User getUser(String username);
 
     @RpcService(rpcId = "user.addUser",hasCallBack = true)

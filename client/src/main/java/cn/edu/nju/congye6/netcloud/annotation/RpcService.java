@@ -34,4 +34,11 @@ public @interface RpcService {
      * @return
      */
     boolean hasCallBack() default false;
+
+    /**
+     * 异常重试次数
+     * 超时重试由其他参数设置
+     * @return
+     */
+    int retryTimes() default 0;
 }
