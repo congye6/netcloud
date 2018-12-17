@@ -1,9 +1,8 @@
 package cn.edu.nju.congye6.netcloud.register;
 
 import cn.edu.nju.congye6.netcloud.network.NettyServer;
-import cn.edu.nju.congye6.netcloud.service_register.ServiceImporter;
+import cn.edu.nju.congye6.netcloud.service_invoker.ServiceImporter;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 

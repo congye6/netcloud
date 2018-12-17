@@ -139,8 +139,10 @@ public class ChannelPool {
 
         //删除已断开连接的channel
         for(String address:channelMap.keySet()){
-            if(!addressList.contains(address))
+            if(!addressList.contains(address)){
                 removeChannel(address);
+                LOGGER.info("remove channel to "+address);
+            }
         }
     }
 

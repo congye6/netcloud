@@ -1,4 +1,4 @@
-package cn.edu.nju.congye6.netcloud.service_register;
+package cn.edu.nju.congye6.netcloud.service_invoker;
 
 import cn.edu.nju.congye6.netcloud.enumeration.RpcContentType;
 import com.alibaba.fastjson.JSONObject;
