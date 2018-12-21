@@ -1,5 +1,8 @@
 package cn.edu.nju.congye6.netcloud.annotation;
 
+import org.springframework.lang.Nullable;
+
+import javax.lang.model.type.NullType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,6 +21,12 @@ public @interface CloudService {
      * @return
      */
     String serviceName();
+
+    /**
+     * hystrix降级逻辑
+     * @return
+     */
+    Class<?>[] fallback() default {};
 
 
 }

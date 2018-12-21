@@ -24,9 +24,9 @@ public class NettyServer {
 
 
     public void startServerInPort() throws Exception{
-
+        //TODO eventloop的重用
         EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
         try{
             //设置启动辅助类
             ServerBootstrap serverBootstrap = new ServerBootstrap();

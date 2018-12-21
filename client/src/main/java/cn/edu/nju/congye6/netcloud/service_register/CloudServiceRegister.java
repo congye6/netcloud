@@ -61,12 +61,20 @@ public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
         LOGGER.info("register service:"+annotation.serviceName());
         definitionBuilder.addPropertyValue("serviceName", annotation.serviceName());
         definitionBuilder.addPropertyValue("type",interfaceClass);
+        addFallback(annotation.fallback(), definitionBuilder);
         definitionBuilder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
-
         AbstractBeanDefinition beanDefinition=definitionBuilder.getBeanDefinition();
         beanDefinition.setPrimary(true);
         BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, interfaceClass.getCanonicalName(), new String[]{});
         BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
+    }
+
+    private void addFallback(Class<?>[] fallbacks, BeanDefinitionBuilder definitionBuilder) {
+        Class<?> fallback=null;
+        if(fallbacks.length>0){
+            fallback=fallbacks[0];
+        }
+        definitionBuilder.addPropertyValue("fallback",fallback);
     }
 
 }

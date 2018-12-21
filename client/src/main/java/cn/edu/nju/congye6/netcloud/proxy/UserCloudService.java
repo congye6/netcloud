@@ -1,5 +1,6 @@
 package cn.edu.nju.congye6.netcloud.proxy;
 
+import cn.edu.nju.congye6.netcloud.ClientApplication;
 import cn.edu.nju.congye6.netcloud.annotation.CloudService;
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.enumeration.RpcContentType;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Created by cong on 2018-10-22.
  */
-@CloudService(serviceName = "user")
+@CloudService(serviceName = "user",fallback = UserCloudServiceFallback.class)
 public interface UserCloudService {
 
     @RequestMapping(value = "/addUser")

@@ -3,6 +3,8 @@ package cn.edu.nju.congye6.netcloud.service_register;
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.network_client.http.HttpClient;
 import cn.edu.nju.congye6.netcloud.network_client.rpc.RpcClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -12,6 +14,8 @@ import java.lang.reflect.Method;
  * Created by cong on 2018-10-23.
  */
 public class CloudServiceHandler implements InvocationHandler{
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(CloudServiceHandler.class);
 
     private static final HttpClient HTTP_CLIENT =new HttpClient();
 
@@ -37,6 +41,7 @@ public class CloudServiceHandler implements InvocationHandler{
         if(rpcService!=null)
             return RPC_CLIENT.send(serviceName,args,rpcService,method.getReturnType());
 
+        LOGGER.warn("invoke method:"+method.getName()+" fail,no annotation");
         return null;
     }
 
