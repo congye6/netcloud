@@ -3,6 +3,7 @@ package cn.edu.nju.congye6.netcloud.network_client.rpc;
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
 import cn.edu.nju.congye6.netcloud.network_client.request_builder.RpcRequestBuilder;
 import cn.edu.nju.congye6.netcloud.util.SleepUtil;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
@@ -32,15 +33,32 @@ public class RpcClient {
 
 
     /**
-     * 动态代理发起rpc调用
+     * 同步发起调用
+     * @param serviceName
+     * @param params
+     * @param rpcService
+     * @param returnType
+     * @return
+     * @throws Exception
+     */
+    public Object send(String serviceName, Object[] params, RpcService rpcService,Class<?> returnType) throws Exception{
+        RpcFuture future=sendAsync(serviceName,params,rpcService);
+        if(RpcFuture.class==returnType)//需要返回future
+            return future;
+        RpcResponse response=future.get(MAX_TIME_OUT,TimeUnit.SECONDS);
+        return JSONObject.parseObject(response.getResponse(),returnType);//根据返回值类型解析响应
+    }
+
+
+    /**
+     * 异步发起rpc调用,注意失败重试
      * @param serviceName 服务名称
      * @param params      方法参数
      * @param rpcService  方法注解
-     * @param returnType  返回值类型
      * @return            根据返回值类型解析返回值，如果是RpcFuture将直接返回future
      * @throws Exception
      */
-    public Object send(String serviceName, Object[] params, RpcService rpcService,Class<?> returnType) throws Exception {
+    public RpcFuture sendAsync(String serviceName, Object[] params, RpcService rpcService) throws Exception {
         RpcFuture future=new RpcFuture();
         CallBackBuilder.buildCallBack(rpcService,future,params);
 
@@ -49,11 +67,11 @@ public class RpcClient {
 
         int retryTimes=rpcService.retryTimes();
         boolean success=false;
-        Object result=null;
+        RpcFuture result=null;
         //发起调用,失败进行重试
         while(!success&&retryTimes>=0) {//还没成功并且还有重试次数
             try {
-                result = invoke(serviceName, returnType, future, request);
+                result = invoke(serviceName, future, request);
                 success = true;
             } catch (Exception e) {
                 LOGGER.warn("invoke error,retryTimes:" + retryTimes,e);
@@ -67,15 +85,14 @@ public class RpcClient {
     }
 
     /**
-     * 发起rpc调用
+     * 异步发起rpc调用
      * @param serviceName
-     * @param returnType
      * @param future
      * @param request
      * @return
      * @throws Exception
      */
-    private Object invoke(String serviceName, Class<?> returnType, RpcFuture future, RpcRequest request) throws Exception {
+    private RpcFuture invoke(String serviceName,RpcFuture future, RpcRequest request) throws Exception {
         ChannelPool channelPool=channelPoolManager.getChannelPool(serviceName);
         Channel channel = channelPool.getChannel();//获取channel
         if(channel==null){
@@ -86,11 +103,7 @@ public class RpcClient {
         responseHandler.addRpcFuture(request.getRequestId(),future);//设置future，以便异步获取结果
         ChannelFuture channelFuture=channel.writeAndFlush(request);
         future.setRequestFuture(channelFuture);
-        if(RpcFuture.class==returnType)//要求返回future
-            return future;
-        //否则同步获取结果,解析json;设置超时时间
-        RpcResponse response=future.get(MAX_TIME_OUT, TimeUnit.SECONDS);
-        return response.getResponse(returnType);
+        return future;
     }
 
 

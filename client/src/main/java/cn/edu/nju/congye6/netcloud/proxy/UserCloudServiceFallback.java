@@ -12,12 +12,12 @@ import java.util.List;
 public class UserCloudServiceFallback implements UserCloudService{
     @Override
     public String addUser(User user) {
-        return null;
+        return "add user may be fail";
     }
 
     @Override
     public User getUser(String username) {
-        return null;
+        return new User();
     }
 
     @Override
