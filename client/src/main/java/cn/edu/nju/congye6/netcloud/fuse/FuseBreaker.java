@@ -49,7 +49,10 @@ public class FuseBreaker {
      * @return
      */
     static FuseBreaker getInstance(String commandKey, FuseMetrics metrics) {
-        FuseBreaker instance = INSTANCE_MAP.putIfAbsent(commandKey, new FuseBreaker(metrics));
+        FuseBreaker instance=INSTANCE_MAP.get(commandKey);
+        if(instance!=null)//instance已存在
+            return instance;
+        instance = INSTANCE_MAP.putIfAbsent(commandKey, new FuseBreaker(metrics));
         if (instance == null) {//instance不存在，说明刚创建的对象加入了map
             return INSTANCE_MAP.get(commandKey);
         } else {//instance已经存在

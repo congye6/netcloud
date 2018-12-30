@@ -102,7 +102,13 @@ public class RpcFuture{
      * @param response
      */
     void set(RpcResponse response){
-        this.response=response;
+        synchronized (this){//原子性保证response只能设置一次
+            if(isDone()){
+                LOGGER.warn("rpc future set twice,requestId:"+response.getRequestId());
+                return;
+            }
+            this.response=response;
+        }
         countDownLatch.countDown();//实发latch，唤醒所有等待线程
         for(RpcCallBack callBack:callBacks){//异步执行，避免用户操作阻塞
             RpcTaskExecutor.excute(()->callBack.callBack(response.getResponse(),response.getHeaders()));

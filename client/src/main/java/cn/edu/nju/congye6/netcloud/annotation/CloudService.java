@@ -28,5 +28,9 @@ public @interface CloudService {
      */
     Class<?>[] fallback() default {};
 
+    String groupKey() default "";
+
+    String commandKey() default "";
+
 
 }

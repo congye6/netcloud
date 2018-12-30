@@ -11,10 +11,7 @@ public abstract class FuseCommand {
      */
     protected final FuseBreaker breaker;
 
-    /**
-     * 线程池，每个group一个
-     */
-    protected final FuseThreadPool threadPool;
+    protected final FuseSemaphore semaphore;
 
     /**
      * 统计信息，每个command一个
@@ -31,10 +28,10 @@ public abstract class FuseCommand {
      */
     protected final String groupKey;
 
-    protected FuseCommand(FuseBreaker breaker, FuseThreadPool threadPool, FuseMetrics metrics, String commadKey, String groupKey) {
+    protected FuseCommand(FuseBreaker breaker, FuseSemaphore semaphore, FuseMetrics metrics, String commadKey, String groupKey) {
         this.metrics = initMetrics(metrics,commadKey);
         this.breaker = initBreaker(breaker,this.metrics,commadKey);
-        this.threadPool = initThreadPool(threadPool,groupKey);
+        this.semaphore=initSemaphore(semaphore,groupKey);
         this.commadKey = commadKey;
         this.groupKey = groupKey;
     }
@@ -46,7 +43,7 @@ public abstract class FuseCommand {
     protected Object excute(){
         if(breaker.isOpen())//断路器已经打开
             return fallback();
-        if(threadPool.isQueueNotAvailable())//线程池队列已满,，无法添加新任务
+        if(!semaphore.tryAcquire())//信号量已满,，无法添加新任务
             return fallback();
         return run();
     }
@@ -79,11 +76,11 @@ public abstract class FuseCommand {
         }
     }
 
-    private FuseThreadPool initThreadPool(FuseThreadPool threadPool,String groupKey){
-        if(threadPool!=null){
-            return threadPool;
+    private FuseSemaphore initSemaphore(FuseSemaphore semaphore,String groupKey){
+        if(semaphore!=null){
+            return semaphore;
         }else{
-            return FuseThreadPool.getInstance(groupKey);
+            return FuseSemaphore.getSemaphore(groupKey);
         }
     }
 
