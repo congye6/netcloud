@@ -17,4 +17,15 @@ public class PropertyUtil{
         return environment.getProperty(name);
     }
 
+    public static Boolean getBooleanProperty(String name){
+        ApplicationContext context=CloudContextUtil.getContext();
+        Environment environment=context.getEnvironment();
+        String str=environment.getProperty(name);
+        if(str==null)
+            return null;
+        return Boolean.parseBoolean(str);
+    }
+
+
+
 }

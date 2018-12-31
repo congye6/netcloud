@@ -31,6 +31,10 @@ public class CloudServiceBean implements FactoryBean<Object>{
      */
     private Class<?> fallback;
 
+    private String groupKey;
+
+    private String commandKey;
+
     @Nullable
     @Override
     public Object getObject() throws Exception {
@@ -39,7 +43,8 @@ public class CloudServiceBean implements FactoryBean<Object>{
             LOGGER.error(message);
             throw new Exception(message);
         }
-        return Proxy.newProxyInstance(type.getClassLoader(),new Class[]{type},new CloudServiceHandler(serviceName));
+        return Proxy.newProxyInstance(type.getClassLoader(),new Class[]{type},
+                new CloudServiceHandler(serviceName,fallback,groupKey,commandKey));
     }
 
     /**
@@ -76,5 +81,21 @@ public class CloudServiceBean implements FactoryBean<Object>{
 
     public void setFallback(Class<?> fallback) {
         this.fallback = fallback;
+    }
+
+    public String getGroupKey() {
+        return groupKey;
+    }
+
+    public void setGroupKey(String groupKey) {
+        this.groupKey = groupKey;
+    }
+
+    public String getCommandKey() {
+        return commandKey;
+    }
+
+    public void setCommandKey(String commandKey) {
+        this.commandKey = commandKey;
     }
 }

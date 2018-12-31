@@ -61,6 +61,8 @@ public class CloudServiceRegister implements ImportBeanDefinitionRegistrar {
         LOGGER.info("register service:"+annotation.serviceName());
         definitionBuilder.addPropertyValue("serviceName", annotation.serviceName());
         definitionBuilder.addPropertyValue("type",interfaceClass);
+        definitionBuilder.addPropertyValue("groupKey",annotation.groupKey());
+        definitionBuilder.addPropertyValue("commandKey",annotation.commandKey());
         addFallback(annotation.fallback(), definitionBuilder);
         definitionBuilder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
         AbstractBeanDefinition beanDefinition=definitionBuilder.getBeanDefinition();

@@ -1,5 +1,7 @@
 package cn.edu.nju.congye6.netcloud.fuse;
 
+import cn.edu.nju.congye6.netcloud.network_client.rpc.RpcFuture;
+
 /**
  * 熔断器命令基类
  * Created by cong on 2018-12-22.
@@ -11,6 +13,9 @@ public abstract class FuseCommand {
      */
     protected final FuseBreaker breaker;
 
+    /**
+     * 信号量，每个group一个
+     */
     protected final FuseSemaphore semaphore;
 
     /**
@@ -40,12 +45,14 @@ public abstract class FuseCommand {
         this(null,null,null,commadKey,groupKey);
     }
 
-    protected Object excute(){
+    protected RpcFuture excute(){
         if(breaker.isOpen())//断路器已经打开
             return fallback();
         if(!semaphore.tryAcquire())//信号量已满,，无法添加新任务
             return fallback();
-        return run();
+        RpcFuture future=run();
+        future.setFuseSemaphore(semaphore);
+        return future;
     }
 
     /**
@@ -53,14 +60,14 @@ public abstract class FuseCommand {
      * 由用户实现
      * @return
      */
-    public abstract Object run();
+    protected abstract RpcFuture run();
 
     /**
      * 降级逻辑
      * 由用户实现
      * @return
      */
-    public abstract Object fallback();
+    protected abstract RpcFuture fallback();
 
     /**
      * 初始化

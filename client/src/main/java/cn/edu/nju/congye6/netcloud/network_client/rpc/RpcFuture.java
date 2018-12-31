@@ -1,6 +1,7 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
+import cn.edu.nju.congye6.netcloud.fuse.FuseSemaphore;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,11 @@ public class RpcFuture{
      * 加锁
      */
     private CountDownLatch countDownLatch=new CountDownLatch(1);
+
+    /**
+     * 限流信号量,熔断器用于统计并发数
+     */
+    private FuseSemaphore fuseSemaphore;
 
     private List<RpcCallBack> callBacks=new ArrayList<>();
 
@@ -59,7 +65,7 @@ public class RpcFuture{
 
     public void cancel(){
         isCancel=true;
-        countDownLatch.countDown();
+        release();
     }
 
     /**
@@ -109,9 +115,19 @@ public class RpcFuture{
             }
             this.response=response;
         }
-        countDownLatch.countDown();//实发latch，唤醒所有等待线程
+        release();
         for(RpcCallBack callBack:callBacks){//异步执行，避免用户操作阻塞
             RpcTaskExecutor.excute(()->callBack.callBack(response.getResponse(),response.getHeaders()));
+        }
+    }
+
+    /**
+     * 成功或取消之后释放latch和信号量
+     */
+    private void release(){
+        countDownLatch.countDown();
+        if(fuseSemaphore!=null){
+            fuseSemaphore.release();
         }
     }
 
@@ -126,6 +142,19 @@ public class RpcFuture{
         }
 
         callBacks.add(callBack);
+    }
+
+    /**
+     * 设置限流信号量
+     * 如果已经完成，信号量直接减一
+     * @param fuseSemaphore
+     */
+    public synchronized void setFuseSemaphore(FuseSemaphore fuseSemaphore){
+        if(this.fuseSemaphore!=null)
+            return;
+        this.fuseSemaphore=fuseSemaphore;
+        if(isDone()||isCancelled())
+            fuseSemaphore.release();
     }
 
     void setRequestFuture(ChannelFuture channelFuture){
