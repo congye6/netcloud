@@ -48,7 +48,7 @@ public abstract class FuseCommand {
     protected RpcFuture excute(){
         if(breaker.isOpen())//断路器已经打开
             return fallback();
-        if(!semaphore.tryAcquire())//信号量已满,，无法添加新任务
+        if(!semaphore.tryAcquire())//信号量已满,无法添加新任务
             return fallback();
         RpcFuture future=run();
         future.setFuseSemaphore(semaphore);

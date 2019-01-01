@@ -13,7 +13,7 @@ import java.util.*;
  * ChannelInboundHandlerAdapter处理由decoder编码的RpcRespnse对象
  * Created by cong on 2018-11-13.
  */
-public class ResponseHandler extends ChannelInboundHandlerAdapter {
+public class ResponseHandler extends ChannelInboundHandlerAdapter implements FutureRemovable {
 
     private static final Logger LOGGER= LoggerFactory.getLogger(ResponseHandler.class);
 
@@ -47,4 +47,8 @@ public class ResponseHandler extends ChannelInboundHandlerAdapter {
     }
 
 
+    @Override
+    public void removeFuture(String requestId) {
+        responseMap.remove(requestId);
+    }
 }

@@ -101,6 +101,7 @@ public class RpcClient {
         }
         ResponseHandler responseHandler=channel.pipeline().get(ResponseHandler.class);
         responseHandler.addRpcFuture(request.getRequestId(),future);//设置future，以便异步获取结果
+        future.setRemover(request.getRequestId(),responseHandler);
         ChannelFuture channelFuture=channel.writeAndFlush(request);
         future.setRequestFuture(channelFuture);
         return future;

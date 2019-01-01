@@ -29,6 +29,7 @@ public class RpcCommand extends FuseCommand{
         super(commadKey, groupKey);
         this.param=param;
         this.fallback=fallback;
+        this.fallbackInstance=fallbackInstance;
     }
 
     public Object invoke() throws Exception{
@@ -54,9 +55,13 @@ public class RpcCommand extends FuseCommand{
         RpcFuture future=new RpcFuture();
         try {
             Object result=fallback.invoke(fallbackInstance,param.getArgs());
-            RpcResponse response=new RpcResponse();
-            response.setResponse(JSONObject.toJSONString(result));
-            future.set(response);
+            if(RpcFuture.class==param.getReturnType()){//用户fallback直接生成RpcFuture
+                future=(RpcFuture)result;
+            }else{
+                RpcResponse response=new RpcResponse();
+                response.setResponse(JSONObject.toJSONString(result));
+                future.set(response);
+            }
         } catch (Exception e) {
             LOGGER.warn("invoke fallback error",e);
             future.cancel();

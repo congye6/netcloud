@@ -36,6 +36,16 @@ public class RpcFuture{
     private List<RpcCallBack> callBacks=new ArrayList<>();
 
     /**
+     * 请求的id
+     */
+    private String requestId;
+
+    /**
+     * 用于成功时删除自己
+     */
+    private FutureRemovable remover;
+
+    /**
      * 响应
      * volatile保证设置完成后，其他线程能马上读到
      */
@@ -122,14 +132,19 @@ public class RpcFuture{
     }
 
     /**
-     * 成功或取消之后释放latch和信号量
+     * 成功或取消之后释放latch和信号量,删除自己在map中的映射
      */
     private void release(){
         countDownLatch.countDown();
         if(fuseSemaphore!=null){
             fuseSemaphore.release();
         }
+
+        if(remover!=null){//删除映射
+            remover.removeFuture(requestId);
+        }
     }
+
 
     /**
      * 添加回调函数
@@ -161,4 +176,8 @@ public class RpcFuture{
         this.requestFuture=channelFuture;
     }
 
+    void setRemover(String requestId,FutureRemovable remover){
+        this.requestId=requestId;
+        this.remover=remover;
+    }
 }
