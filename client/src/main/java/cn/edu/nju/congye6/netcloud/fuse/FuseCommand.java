@@ -1,12 +1,23 @@
 package cn.edu.nju.congye6.netcloud.fuse;
 
 import cn.edu.nju.congye6.netcloud.network_client.rpc.RpcFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.*;
 
 /**
  * 熔断器命令基类
  * Created by cong on 2018-12-22.
  */
 public abstract class FuseCommand {
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(FuseCommand.class);
+
+    /**
+     * 执行超时任务的线程池
+     */
+    private static final ScheduledExecutorService TIME_OUT_SCHEDULE= Executors.newScheduledThreadPool(30);
 
     /**
      * 断路器，每个command一个
@@ -45,6 +56,10 @@ public abstract class FuseCommand {
         this(null,null,null,commadKey,groupKey);
     }
 
+    /**
+     * 执行command
+     * @return
+     */
     protected RpcFuture excute(){
         if(breaker.isOpen())//断路器已经打开
             return fallback();
@@ -52,7 +67,25 @@ public abstract class FuseCommand {
             return fallback();
         RpcFuture future=run();
         future.setFuseSemaphore(semaphore);
+        monitorTimeOut(future);
         return future;
+    }
+
+    /**
+     * 执行监控超时的延时任务
+     * 到达时间就设置future的结果
+     * @param future
+     */
+    private void monitorTimeOut(RpcFuture future) {
+        TIME_OUT_SCHEDULE.schedule(()->{
+            RpcFuture fallbackFuture=fallback();
+            try {
+                future.set(fallbackFuture.get());
+            } catch (Exception e) {
+                LOGGER.warn("invoke fallback error",e);
+                future.cancel();
+            }
+        },5, TimeUnit.SECONDS);
     }
 
     /**

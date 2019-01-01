@@ -115,9 +115,10 @@ public class RpcFuture{
 
     /**
      * 设置future的结果
+     * TODO 限制set方法的访问
      * @param response
      */
-    void set(RpcResponse response){
+    public void set(RpcResponse response){
         synchronized (this){//原子性保证response只能设置一次
             if(isDone()){
                 LOGGER.warn("rpc future set twice,requestId:"+response.getRequestId());
