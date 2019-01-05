@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * 熔断器命令基类
@@ -76,8 +77,10 @@ public abstract class FuseCommand {
      * 到达时间就设置future的结果
      * @param future
      */
-    private void monitorTimeOut(RpcFuture future) {
+    private void monitorTimeOut(final RpcFuture future) {
         TIME_OUT_SCHEDULE.schedule(()->{
+            if(future.isDone()||future.isCancelled())
+                return;
             RpcFuture fallbackFuture=fallback();
             try {
                 future.set(fallbackFuture.get());

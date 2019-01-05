@@ -14,6 +14,10 @@ public class FuseMetrics {
      */
     private static final Map<String,FuseMetrics> INSTANCE_MAP=new ConcurrentHashMap<>();
 
+
+    private FuseRollingNumber qpsCounter;
+
+
     /**
      * 根据commandKey获取线程池实例
      * 不存在则新创建一个
