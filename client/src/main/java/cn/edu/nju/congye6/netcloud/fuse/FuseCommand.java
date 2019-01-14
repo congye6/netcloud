@@ -62,10 +62,15 @@ public abstract class FuseCommand {
      * @return
      */
     protected RpcFuture excute(){
-        if(breaker.isOpen())//断路器已经打开
+        if(breaker.isOpen()){//断路器已经打开
+            metrics.breakerFail();
             return fallback();
-        if(!semaphore.tryAcquire())//信号量已满,无法添加新任务
+        }
+
+        if(!semaphore.tryAcquire()){//信号量已满,无法添加新任务
+            metrics.semaphoreFail();
             return fallback();
+        }
         RpcFuture future=run();
         future.setFuseSemaphore(semaphore);
         monitorTimeOut(future);
@@ -83,6 +88,7 @@ public abstract class FuseCommand {
                 return;
             RpcFuture fallbackFuture=fallback();
             try {
+                metrics.timeout();
                 future.set(fallbackFuture.get());
             } catch (Exception e) {
                 LOGGER.warn("invoke fallback error",e);

@@ -1,5 +1,6 @@
 package cn.edu.nju.congye6.netcloud.fuse;
 
+import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -62,8 +63,12 @@ public class FuseRollingNumber {
      * 获取总数
      * @return
      */
-    public int count(){
-        return 0;
+    public int count(FuseEventType eventType){
+        int count=0;
+        for(FuseQpsBucket bucket:bucketCircle){
+            count+=bucket.get(eventType);
+        }
+        return count;
     }
 
     /**
