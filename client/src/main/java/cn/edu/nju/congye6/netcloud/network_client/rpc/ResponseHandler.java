@@ -33,7 +33,7 @@ public class ResponseHandler extends ChannelInboundHandlerAdapter implements Fut
             LOGGER.warn("accept reponse without future,requestId:"+rpcResponse.getRequestId());
             return;
         }
-        future.set(rpcResponse);//设置响应
+        future.success(rpcResponse);//设置响应
         responseMap.remove(rpcResponse.getRequestId());//已经响应，移除future
     }
 

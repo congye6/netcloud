@@ -1,6 +1,7 @@
 package cn.edu.nju.congye6.netcloud.network_client.rpc;
 
 import cn.edu.nju.congye6.netcloud.annotation.RpcService;
+import cn.edu.nju.congye6.netcloud.fuse.FuseMetrics;
 import cn.edu.nju.congye6.netcloud.fuse.FuseSemaphore;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
@@ -33,6 +34,11 @@ public class RpcFuture{
      */
     private FuseSemaphore fuseSemaphore;
 
+    /**
+     * 统计访问成功或失败的次数
+     */
+    private FuseMetrics metrics;
+
     private List<RpcCallBack> callBacks=new ArrayList<>();
 
     /**
@@ -56,10 +62,17 @@ public class RpcFuture{
      */
     private ChannelFuture requestFuture;
 
+
+
     /**
      * 是否取消
      */
     private volatile boolean isCancel=false;
+
+    /**
+     * 成功或者失败
+     */
+    private volatile boolean isSuccess=false;
 
     /**
      * 是否已经完成
@@ -114,15 +127,42 @@ public class RpcFuture{
     }
 
     /**
+     * 访问成功
      * 设置future的结果
-     * TODO 限制set方法的访问
      * @param response
      */
-    public void set(RpcResponse response){
+    void success(RpcResponse response){
+        boolean success=setResult(response);
+        if(!success){
+            LOGGER.warn("rpc future success fail since has done,requestId:"+response.getRequestId());
+            return;
+        }
+        metrics.success();
+        isSuccess=true;
+    }
+
+    /**
+     * 访问失败
+     * 设置future的降级处理的结果
+     * @param response
+     */
+    public void fallback(RpcResponse response){
+        boolean success=setResult(response);
+        if(!success){
+            LOGGER.warn("rpc future fallback fail since has done,requestId:"+response.getRequestId());
+        }
+    }
+
+    /**
+     * 设置future的结果
+     * 只能设置一次，设置后释放资源
+     * @param response
+     * @return
+     */
+    private boolean setResult(RpcResponse response){
         synchronized (this){//原子性保证response只能设置一次
-            if(isDone()){
-                LOGGER.warn("rpc future set twice,requestId:"+response.getRequestId());
-                return;
+            if(isDone()||isCancelled()){
+                return false;
             }
             this.response=response;
         }
@@ -130,7 +170,10 @@ public class RpcFuture{
         for(RpcCallBack callBack:callBacks){//异步执行，避免用户操作阻塞
             RpcTaskExecutor.excute(()->callBack.callBack(response.getResponse(),response.getHeaders()));
         }
+        return true;
     }
+
+
 
     /**
      * 成功或取消之后释放latch和信号量,删除自己在map中的映射
@@ -165,12 +208,17 @@ public class RpcFuture{
      * 如果已经完成，信号量直接减一
      * @param fuseSemaphore
      */
-    public synchronized void setFuseSemaphore(FuseSemaphore fuseSemaphore){
+    public synchronized void setFuseMetrics(FuseSemaphore fuseSemaphore,FuseMetrics fuseMetrics){
         if(this.fuseSemaphore!=null)
             return;
         this.fuseSemaphore=fuseSemaphore;
-        if(isDone()||isCancelled())
+        this.metrics=fuseMetrics;
+        if(isDone()||isCancelled()){
             fuseSemaphore.release();
+            if(isSuccess)
+                metrics.success();
+        }
+
     }
 
     void setRequestFuture(ChannelFuture channelFuture){

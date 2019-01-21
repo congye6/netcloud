@@ -19,11 +19,15 @@ public enum FuseEventType {
     /**
      * 被断路器隔断
      */
-    BREAKER_FAIL(3);
+    BREAKER_FAIL(3),
+    /**
+     * 调用异常
+     */
+    EXCEPTION(4);
 
     private int index;
 
-    private FuseEventType(int index){
+    FuseEventType(int index){
         this.index=index;
     }
 

@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 /**
  * Created by cong on 2018-12-31.
@@ -46,6 +45,7 @@ public class RpcCommand extends FuseCommand{
             return RPC_CLIENT.sendAsync(param.getServiceName(),param.getArgs(),param.getAnnotation());
         } catch (Exception e) {
             LOGGER.warn("rpc client invoke exception",e);
+            metrics.exception();
         }
         return fallback();
     }
@@ -60,7 +60,7 @@ public class RpcCommand extends FuseCommand{
             }else{
                 RpcResponse response=new RpcResponse();
                 response.setResponse(JSONObject.toJSONString(result));
-                future.set(response);
+                future.fallback(response);
             }
         } catch (Exception e) {
             LOGGER.warn("invoke fallback error",e);

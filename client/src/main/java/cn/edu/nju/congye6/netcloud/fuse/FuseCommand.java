@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * 熔断器命令基类
@@ -72,7 +71,7 @@ public abstract class FuseCommand {
             return fallback();
         }
         RpcFuture future=run();
-        future.setFuseSemaphore(semaphore);
+        future.setFuseMetrics(semaphore,metrics);
         monitorTimeOut(future);
         return future;
     }
@@ -89,7 +88,7 @@ public abstract class FuseCommand {
             RpcFuture fallbackFuture=fallback();
             try {
                 metrics.timeout();
-                future.set(fallbackFuture.get());
+                future.fallback(fallbackFuture.get());
             } catch (Exception e) {
                 LOGGER.warn("invoke fallback error",e);
                 future.cancel();

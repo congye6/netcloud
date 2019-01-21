@@ -37,7 +37,12 @@ public class FuseMetrics {
         qpsCounter.count(FuseEventType.SEMAPHORE_FAIL);
     }
 
-    void success(){
+    public void exception(){
+        LOGGER.info("exception count");
+        qpsCounter.count(FuseEventType.EXCEPTION);
+    }
+
+    public void success(){
         LOGGER.info("success count");
         qpsCounter.count(FuseEventType.SUCCESS);
     }
