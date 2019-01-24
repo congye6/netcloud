@@ -34,7 +34,15 @@ public class FuseQpsBucket {
         return count[eventType.index()].longValue();
     }
 
-    public long getStartTime() {
+    long getStartTime() {
         return startTime;
+    }
+
+    /**
+     * 获取某一时刻的计数快照
+     * @return
+     */
+    FuseCount get(){
+        return new FuseCount(count);
     }
 }

@@ -72,6 +72,18 @@ public class FuseRollingNumber {
     }
 
     /**
+     * 获取某一时刻的计数快照
+     * @return
+     */
+    public FuseCount count(){
+        FuseCount sum=new FuseCount();
+        for(FuseQpsBucket bucket:bucketCircle){
+            sum.increment(bucket.get());
+        }
+        return sum;
+    }
+
+    /**
      * 递增
      */
     public void increment(FuseEventType eventType){

@@ -29,29 +29,45 @@ public class FuseMetrics {
 
     void breakerFail(){
         LOGGER.info("breaker fail count");
-        qpsCounter.count(FuseEventType.BREAKER_FAIL);
+        qpsCounter.increment(FuseEventType.BREAKER_FAIL);
     }
 
     void semaphoreFail(){
         LOGGER.info("semaphore fail count");
-        qpsCounter.count(FuseEventType.SEMAPHORE_FAIL);
+        qpsCounter.increment(FuseEventType.SEMAPHORE_FAIL);
     }
 
     public void exception(){
         LOGGER.info("exception count");
-        qpsCounter.count(FuseEventType.EXCEPTION);
+        qpsCounter.increment(FuseEventType.EXCEPTION);
     }
 
     public void success(){
         LOGGER.info("success count");
-        qpsCounter.count(FuseEventType.SUCCESS);
+        qpsCounter.increment(FuseEventType.SUCCESS);
     }
 
     void timeout(){
         LOGGER.info("timeout count");
-        qpsCounter.count(FuseEventType.TIME_OUT);
+        qpsCounter.increment(FuseEventType.TIME_OUT);
     }
 
+    /**
+     * 获取成功次数
+     * @return
+     */
+    long getSuccessCount(){
+        return qpsCounter.count(FuseEventType.SUCCESS);
+    }
+
+    /**
+     * 获取总调用次数
+     * @return
+     */
+    long getTotal(){
+        FuseCount sum=qpsCounter.count();
+        return sum.getTotal();
+    }
 
     /**
      * 根据commandKey获取线程池实例
